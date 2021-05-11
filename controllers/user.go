@@ -13,6 +13,11 @@ type UserController struct{}
 var userModel = new(models.UserModel)
 
 func (UserController) Register(c *gin.Context) {
+	if !HasAdminRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Hanya admin yang dapat register user"})
+		return
+	}
+
 	var form forms.RegisterForm
 
 	if err := c.ShouldBindJSON(&form); err != nil {

@@ -2,23 +2,22 @@ package conf
 
 import (
 	"shin-psmapi/models"
+	"shin-psmapi/utils"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
-const IdentityKey = "id"
-
 var JWTMiddleware *jwt.GinJWTMiddleware
 
 func InitJWTMiddleware() (*jwt.GinJWTMiddleware, error) {
 	JWTMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:         "shin-psmapi",
+		Realm:         utils.JWTRealm,
 		Key:           []byte("very very very secret key"),
 		Timeout:       time.Hour * 24,
 		MaxRefresh:    time.Hour,
-		IdentityKey:   IdentityKey,
+		IdentityKey:   utils.JWTIdentityKey,
 		Authenticator: models.AuthenticateUser,
 		Authorizator:  authorizator,
 		Unauthorized:  unauthorized,
@@ -26,8 +25,8 @@ func InitJWTMiddleware() (*jwt.GinJWTMiddleware, error) {
 		LoginResponse: loginResponse,
 		TimeFunc:      time.Now,
 		SendCookie:    true,
-		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
-		TokenHeadName: "Bearer",
+		TokenLookup:   utils.JWTTokenLookup,
+		TokenHeadName: utils.JWTTokenHeadName,
 	})
 
 	return JWTMiddleware, err
@@ -45,7 +44,7 @@ func unauthorized(c *gin.Context, code int, message string) {
 
 func payloadFunc(data interface{}) jwt.MapClaims {
 	if user, ok := data.(models.User); ok {
-		return jwt.MapClaims{IdentityKey: user.ID}
+		return jwt.MapClaims{utils.JWTIdentityKey: user.ID}
 	}
 
 	return jwt.MapClaims{}
