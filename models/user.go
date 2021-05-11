@@ -11,10 +11,10 @@ import (
 
 type User struct {
 	ID       int            `json:"id"`
-	Email    string         `json:"email" gorm:"size:256, not null"`
-	Password string         `json:"password" gorm:"size:128, not null"`
-	Username string         `json:"username" gorm:"size:256, not null"`
-	Role     utils.UserRole `json:"role" gorm:"type:user_role, not null"`
+	Email    string         `json:"email" gorm:"size:256,not null"`
+	Password string         `json:"password" gorm:"size:128,not null"`
+	Username string         `json:"username" gorm:"size:256,not null"`
+	Role     utils.UserRole `json:"role" gorm:"type:user_role,not null"`
 }
 
 type UserModel struct{}
@@ -36,10 +36,10 @@ func (UserModel) Register(form forms.RegisterForm) (User, error) {
 		return User{}, errors.New("gagal meng-hash password: " + err.Error())
 	}
 
-	u := User{Email: form.Email, Password: string(hashedPwd), Username: form.Username, Role: form.Role}
-	if err = db.Create(&u).Error; err != nil {
+	user := User{Email: form.Email, Password: string(hashedPwd), Username: form.Username, Role: form.Role}
+	if err = db.Create(&user).Error; err != nil {
 		return User{}, err
 	}
 
-	return u, nil
+	return user, nil
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"shin-psmapi/conf"
 	"shin-psmapi/db"
 	"shin-psmapi/migration"
 	"shin-psmapi/utils"
@@ -18,7 +19,7 @@ func main() {
 	db.Init()
 	migration.Migrate(db.GetDB())
 
-	r.Static("/public", "./public")
+	conf.SetupRoutes(r)
 	setupValidators()
 
 	port, ok := os.LookupEnv("PORT")
