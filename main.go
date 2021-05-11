@@ -5,7 +5,6 @@ import (
 	"os"
 	"shin-psmapi/conf"
 	"shin-psmapi/db"
-	"shin-psmapi/migration"
 	"shin-psmapi/utils"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +16,10 @@ func main() {
 	r := gin.Default()
 
 	db.Init()
-	migration.Migrate(db.GetDB())
 
+	conf.MigrateDB(db.GetDB())
 	conf.SetupRoutes(r)
+
 	setupValidators()
 
 	port, ok := os.LookupEnv("PORT")
