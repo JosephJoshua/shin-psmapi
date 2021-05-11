@@ -23,22 +23,15 @@ func Init() {
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		DBHost, DBPort, DBUser, DBPassword, DBName)
 
-	tmp, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	tmp, err := gorm.Open(postgres.Open(connStr), &gorm.Config{
+		PrepareStmt: true,
+	})
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	db = tmp
-}
-
-func Migrate() {
-	if db == nil {
-		Init()
-	}
-
-	// Migrate models
-	db.AutoMigrate()
 }
 
 func GetDB() *gorm.DB {
