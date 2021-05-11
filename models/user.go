@@ -6,6 +6,7 @@ import (
 	"shin-psmapi/forms"
 	"shin-psmapi/utils"
 
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,6 +19,24 @@ type User struct {
 }
 
 type UserModel struct{}
+
+func AuthenticateUser(c *gin.Context) (interface{}, error) {
+	var form forms.LoginForm
+	if err := c.ShouldBindJSON(&form); err != nil {
+		return nil, err
+	}
+
+	var user User
+	if err := db.GetDB().Where("email=LOWER(?)", form.Email).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password)); err != nil {
+		return nil, errors.New("email atau password salah")
+	}
+
+	return user, nil
+}
 
 func (UserModel) Register(form forms.RegisterForm) (User, error) {
 	db := db.GetDB()

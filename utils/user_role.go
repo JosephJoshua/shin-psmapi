@@ -18,7 +18,7 @@ func IsValidUserRole(r string) bool {
 }
 
 func (r *UserRole) Scan(value interface{}) error {
-	*r = UserRole(value.([]byte))
+	*r = UserRole(value.(string))
 	return nil
 }
 

@@ -17,8 +17,13 @@ func main() {
 
 	db.Init()
 
+	authMiddleware, err := conf.InitJWTMiddleware()
+	if err != nil {
+		log.Fatal("JWT initialization error: " + err.Error())
+	}
+
 	conf.MigrateDB(db.GetDB())
-	conf.SetupRoutes(r)
+	conf.SetupRoutes(r, authMiddleware)
 
 	setupValidators()
 
