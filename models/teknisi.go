@@ -11,6 +11,10 @@ type Teknisi struct {
 	Nama string `json:"nama" gorm:"size:256,not null"`
 }
 
+func (Teknisi) TableName() string {
+	return "teknisi"
+}
+
 type TeknisiModel struct{}
 
 func (TeknisiModel) All(searchQuery string) ([]Teknisi, error) {
