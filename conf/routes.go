@@ -13,6 +13,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	api := r.Group("/api")
 	{
 		userController := controllers.UserController{}
+		salesController := controllers.SalesController{}
 
 		api.POST("/login", authMiddleware.LoginHandler)
 
@@ -23,6 +24,15 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			// admin accounts and login to that account.
 			authRoutes.POST("/register", userController.Register)
 			authRoutes.GET("/refresh_token", authMiddleware.RefreshHandler)
+		}
+
+		salesRoutes := api.Group("/sales")
+		salesRoutes.Use(authMiddleware.MiddlewareFunc())
+		{
+			salesRoutes.GET("/", salesController.GetAll)
+			salesRoutes.POST("/", salesController.Create)
+			salesRoutes.GET("/:id", salesController.GetByID)
+			salesRoutes.DELETE("/:id", salesController.Delete)
 		}
 	}
 }
