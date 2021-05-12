@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"shin-psmapi/db"
 	"shin-psmapi/forms"
 )
@@ -26,9 +27,14 @@ func (SalesModel) All(searchQuery string) ([]Sales, error) {
 func (SalesModel) ByID(id int) (Sales, error) {
 	var sales Sales
 
-	err := db.GetDB().Where("id = ?", id).Find(&sales).Error
-	if err != nil {
-		return sales, err
+	res := db.GetDB().Where("id = ?", id).Find(&sales)
+
+	if res.Error != nil {
+		return sales, res.Error
+	}
+
+	if res.RowsAffected < 1 {
+		return Sales{}, fmt.Errorf("tidak ada sales dengan id %d", id)
 	}
 
 	return sales, nil
@@ -42,6 +48,15 @@ func (SalesModel) Create(form forms.CreateSalesForm) error {
 }
 
 func (SalesModel) Delete(id int) error {
-	err := db.GetDB().Delete(&Sales{}, id).Error
-	return err
+	res := db.GetDB().Delete(&Sales{}, id)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected < 1 {
+		return fmt.Errorf("tidak terdapat sales dengan ID %d", id)
+	}
+
+	return nil
 }
