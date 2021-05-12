@@ -42,5 +42,9 @@ func setupValidators() {
 		v.RegisterValidation("user_role", func(fl validator.FieldLevel) bool {
 			return utils.IsValidUserRole(fl.Field().String())
 		})
+
+		v.RegisterValidation("servisan_search_by_col", func(fl validator.FieldLevel) bool {
+			return utils.IsValidServisanSearchByColumn(fl.Field().String())
+		})
 	}
 }
