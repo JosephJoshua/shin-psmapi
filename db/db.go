@@ -20,6 +20,10 @@ const (
 )
 
 func Init() {
+	if db != nil {
+		return
+	}
+
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		DBHost, DBPort, DBUser, DBPassword, DBName)
 
