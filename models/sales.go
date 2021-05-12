@@ -34,17 +34,17 @@ func (SalesModel) ByID(id int) (Sales, error) {
 	}
 
 	if res.RowsAffected < 1 {
-		return Sales{}, fmt.Errorf("tidak ada sales dengan id %d", id)
+		return Sales{}, fmt.Errorf("tidak ada sales dengan ID %d", id)
 	}
 
 	return sales, nil
 }
 
-func (SalesModel) Create(form forms.CreateSalesForm) error {
+func (SalesModel) Create(form forms.CreateSalesForm) (id int, err error) {
 	sales := Sales{Nama: form.Nama}
-	err := db.GetDB().Create(&sales).Error
+	err = db.GetDB().Create(&sales).Error
 
-	return err
+	return sales.ID, err
 }
 
 func (SalesModel) Delete(id int) error {
@@ -55,7 +55,7 @@ func (SalesModel) Delete(id int) error {
 	}
 
 	if res.RowsAffected < 1 {
-		return fmt.Errorf("tidak terdapat sales dengan ID %d", id)
+		return fmt.Errorf("tidak ada sales dengan ID %d", id)
 	}
 
 	return nil
