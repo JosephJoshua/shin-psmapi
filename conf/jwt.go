@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"shin-psmapi/forms"
 	"shin-psmapi/models"
 	"shin-psmapi/utils"
 	"time"
@@ -18,7 +19,7 @@ func InitJWTMiddleware() (*jwt.GinJWTMiddleware, error) {
 		Timeout:       time.Hour * 24,
 		MaxRefresh:    time.Hour,
 		IdentityKey:   utils.JWTIdentityKey,
-		Authenticator: models.AuthenticateUser,
+		Authenticator: authenticator,
 		Authorizator:  authorizator,
 		Unauthorized:  unauthorized,
 		PayloadFunc:   payloadFunc,
@@ -30,6 +31,15 @@ func InitJWTMiddleware() (*jwt.GinJWTMiddleware, error) {
 	})
 
 	return JWTMiddleware, err
+}
+
+func authenticator(c *gin.Context) (interface{}, error) {
+	var form forms.LoginForm
+	if err := c.ShouldBindJSON(&form); err != nil {
+		return nil, err
+	}
+
+	return models.AuthenticateUser(form)
 }
 
 func authorizator(data interface{}, c *gin.Context) bool {
