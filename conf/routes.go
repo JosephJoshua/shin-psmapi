@@ -15,6 +15,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		userController := controllers.UserController{}
 		salesController := controllers.SalesController{}
 		teknisiController := controllers.TeknisiController{}
+		servisanController := controllers.ServisanController{}
 
 		api.POST("/login", authMiddleware.LoginHandler)
 
@@ -43,6 +44,12 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			teknisiRoutes.POST("/", teknisiController.Create)
 			teknisiRoutes.GET("/:id", teknisiController.GetByID)
 			teknisiRoutes.DELETE("/:id", teknisiController.Delete)
+		}
+
+		servisanRoutes := api.Group("/servisan")
+		servisanRoutes.Use(authMiddleware.MiddlewareFunc())
+		{
+			servisanRoutes.GET("/", servisanController.GetAll)
 		}
 	}
 }
