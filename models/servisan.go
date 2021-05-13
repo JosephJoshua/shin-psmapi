@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 	"shin-psmapi/db"
 	"shin-psmapi/forms"
@@ -27,7 +26,7 @@ type Servisan struct {
 	Teknisi            Teknisi              `json:"-" gorm:"foreignKey:IDTeknisi;constraint:OnDelete:RESTRICT;"`
 	Sales              Sales                `json:"-" gorm:"foreignKey:IDSales;constraint:OnDelete:RESTRICT;"`
 	Status             utils.StatusServisan `json:"status" gorm:"type:status_servisan;not null"`
-	TanggalKonfirmasi  sql.NullTime         `json:"tanggal_konfirmasi"`
+	TanggalKonfirmasi  utils.NullTime       `json:"tanggal_konfirmasi" gorm:"type:timestamp with time zone"`
 	IsiKonfirmasi      string               `json:"isi_konfirmasi" gorm:"size:512"`
 	Biaya              float64              `json:"biaya" gorm:"type:double precision;not null;default:0"`
 	Diskon             int                  `json:"diskon" gorm:"check:valid_diskon,diskon >= 0 AND diskon <= 100;not null;default:0"`
@@ -37,7 +36,7 @@ type Servisan struct {
 	HargaSparepart     float64              `json:"harga_sparepart" gorm:"->;type:double precision;not null;default:0"`
 	Sisa               float64              `json:"sisa" gorm:"->;type:double precision GENERATED ALWAYS AS (((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya) - dp)) STORED;not null"`
 	LabaRugi           float64              `json:"laba_rugi" gorm:"->;type:double precision;not null;default:0"`
-	TanggalPengambilan sql.NullTime         `json:"tanggal_pengambilan"`
+	TanggalPengambilan utils.NullTime       `json:"tanggal_pengambilan" gorm:"type:timestamp with timezone"`
 }
 
 func (Servisan) TableName() string {
@@ -145,13 +144,13 @@ func (ServisanModel) Delete(nomorNota int) error {
 	return nil
 }
 
-func getTanggalPengambilan(s utils.StatusServisan) sql.NullTime {
+func getTanggalPengambilan(s utils.StatusServisan) utils.NullTime {
 	if s == utils.StatusServisanJadiSudahDiambil || s == utils.StatusServisanTdkJadiSudahDiambil {
-		return sql.NullTime{
+		return utils.NullTime{
 			Time:  time.Now(),
 			Valid: true,
 		}
 	}
 
-	return sql.NullTime{}
+	return utils.NullTime{}
 }
