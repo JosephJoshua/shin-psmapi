@@ -5,7 +5,7 @@ import "database/sql/driver"
 type StatusServisan string
 
 const (
-	StatusServisanSedangDikerjakan    StatusServisan = "Sedang Dikerjakan"
+	StatusServisanSedangDikerjakan    StatusServisan = "Sedang dikerjakan"
 	StatusServisanPending             StatusServisan = "Pending"
 	StatusServisanJadiBelumDiambil    StatusServisan = "Jadi (Belum diambil)"
 	StatusServisanJadiSudahDiambil    StatusServisan = "Jadi (Sudah diambil)"
