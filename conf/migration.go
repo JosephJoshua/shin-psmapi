@@ -13,4 +13,5 @@ func MigrateDB(db *gorm.DB) {
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Sales{})
 	db.AutoMigrate(&models.Teknisi{})
+	db.AutoMigrate(&models.Servisan{})
 }
