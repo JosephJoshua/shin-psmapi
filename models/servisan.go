@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"shin-psmapi/db"
 	"shin-psmapi/forms"
@@ -23,20 +24,20 @@ type Servisan struct {
 	KataSandiPola      string               `json:"kata_sandi_pola" gorm:"size:128"`
 	IDTeknisi          int                  `json:"id_teknisi" gorm:"type:integer;not null"`
 	IDSales            int                  `json:"id_sales" gorm:"type:integer;not null"`
-	Teknisi            Teknisi              `gorm:"foreignKey:IDTeknisi;constraint:OnDelete:RESTRICT;"`
-	Sales              Sales                `gorm:"foreignKey:IDSales;constraint:OnDelete:RESTRICT;"`
+	Teknisi            Teknisi              `json:"-" gorm:"foreignKey:IDTeknisi;constraint:OnDelete:RESTRICT;"`
+	Sales              Sales                `json:"-" gorm:"foreignKey:IDSales;constraint:OnDelete:RESTRICT;"`
 	Status             utils.StatusServisan `json:"status" gorm:"type:status_servisan;not null"`
-	TanggalKonfirmasi  time.Time            `json:"tanggal_konfirmasi"`
+	TanggalKonfirmasi  sql.NullTime         `json:"tanggal_konfirmasi"`
 	IsiKonfirmasi      string               `json:"isi_konfirmasi" gorm:"size:512"`
 	Biaya              float64              `json:"biaya" gorm:"type:double precision;not null;default:0"`
-	Diskon             int                  `json:"diskon" gorm:"not null;default:0"`
+	Diskon             int                  `json:"diskon" gorm:"check:valid_diskon,diskon >= 0 AND diskon <= 100;not null;default:0"`
 	DP                 float64              `json:"dp" gorm:"type:double precision;not null;default:0"`
 	TambahanBiaya      float64              `json:"tambahan_biaya" gorm:"type:double precision;not null;default:0"`
-	TotalBiaya         float64              `json:"total_biaya" gorm:"type:double precision GENERATED ALWAYS AS (((((((100 - diskon) / 100))::double precision * biaya) + tambahan_biaya) - dp)) STORED;not null"`
-	HargaSparepart     float64              `json:"harga_sparepart" gorm:"type:double precision;not null;default:0"`
-	Sisa               float64              `json:"sisa" gorm:"type:double precision GENERATED ALWAYS AS (((((((100 - diskon) / 100))::double precision * biaya) + tambahan_biaya) - dp)) STORED;not null"`
-	LabaRugi           float64              `json:"laba_rugi" gorm:"type:double precision;not null;default:0"`
-	TanggalPengambilan time.Time            `json:"tanggal_pengambilan"`
+	TotalBiaya         float64              `json:"total_biaya" gorm:"->;type:double precision GENERATED ALWAYS AS ((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya)) STORED;not null"`
+	HargaSparepart     float64              `json:"harga_sparepart" gorm:"->;type:double precision;not null;default:0"`
+	Sisa               float64              `json:"sisa" gorm:"->;type:double precision GENERATED ALWAYS AS (((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya) - dp)) STORED;not null"`
+	LabaRugi           float64              `json:"laba_rugi" gorm:"->;type:double precision;not null;default:0"`
+	TanggalPengambilan sql.NullTime         `json:"tanggal_pengambilan"`
 }
 
 func (Servisan) TableName() string {
@@ -100,4 +101,43 @@ func (ServisanModel) ByNomorNota(nomorNota int) (Servisan, error) {
 	}
 
 	return servisan, nil
+}
+
+func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err error) {
+	servisan := Servisan{
+		NamaPelanggan:      form.NamaPelanggan,
+		NoHp:               form.NoHp,
+		TipeHp:             form.TipeHp,
+		Imei:               form.Imei,
+		KondisiHp:          form.KondisiHp,
+		Kerusakan:          form.Kerusakan,
+		YangBlmDicek:       form.YangBlmDicek,
+		Kelengkapan:        form.Kelengkapan,
+		Warna:              form.Warna,
+		KataSandiPola:      form.KataSandiPola,
+		IDTeknisi:          form.IDTeknisi,
+		IDSales:            form.IDSales,
+		Status:             form.Status,
+		TanggalKonfirmasi:  utils.ToNullableTime(form.TanggalKonfirmasi),
+		IsiKonfirmasi:      form.IsiKonfirmasi,
+		Biaya:              form.Biaya,
+		Diskon:             form.Diskon,
+		DP:                 form.DP,
+		TambahanBiaya:      form.TambahanBiaya,
+		TanggalPengambilan: getTanggalPengambilan(form.Status),
+	}
+
+	err = db.GetDB().Create(&servisan).Error
+	return servisan.NomorNota, err
+}
+
+func getTanggalPengambilan(s utils.StatusServisan) sql.NullTime {
+	if s == utils.StatusServisanJadiSudahDiambil || s == utils.StatusServisanTdkJadiSudahDiambil {
+		return sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		}
+	}
+
+	return sql.NullTime{}
 }

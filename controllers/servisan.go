@@ -56,3 +56,27 @@ func (ServisanController) GetByNomorNota(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": servisan})
 }
+
+func (ServisanController) Create(c *gin.Context) {
+	var form forms.CreateServisanForm
+	if err := c.ShouldBindJSON(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid request body",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	nomorNota, err := servisanModel.Create(form)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Gagal saat membuat servisan",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"nomor_nota": nomorNota})
+}
