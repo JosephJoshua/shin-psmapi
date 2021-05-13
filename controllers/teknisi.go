@@ -16,7 +16,12 @@ var teknisiModel = new(models.TeknisiModel)
 func (TeknisiController) GetAll(c *gin.Context) {
 	form := forms.GetAllTeknisiForm{}
 	if err := c.ShouldBindQuery(&form); err != nil {
-		form.SearchQuery = ""
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid query parameters",
+			"error":   err.Error(),
+		})
+
+		return
 	}
 
 	teknisiList, err := teknisiModel.All(form.SearchQuery)

@@ -16,7 +16,12 @@ var salesModel = new(models.SalesModel)
 func (SalesController) GetAll(c *gin.Context) {
 	form := forms.GetAllSalesForm{}
 	if err := c.ShouldBindQuery(&form); err != nil {
-		form.SearchQuery = ""
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid request parameters",
+			"error":   err.Error(),
+		})
+
+		return
 	}
 
 	salesList, err := salesModel.All(form.SearchQuery)
