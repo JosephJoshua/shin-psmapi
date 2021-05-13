@@ -80,3 +80,22 @@ func (ServisanController) Create(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"nomor_nota": nomorNota})
 }
+
+func (ServisanController) Delete(c *gin.Context) {
+	nomorNota, err := strconv.Atoi(c.Param("nomor_nota"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Nomor nota servisan harus berupa angka"})
+		return
+	}
+
+	if err := servisanModel.Delete(nomorNota); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Gagal saat menghapus servisan",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}

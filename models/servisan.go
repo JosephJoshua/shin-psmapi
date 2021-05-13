@@ -131,6 +131,20 @@ func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err e
 	return servisan.NomorNota, err
 }
 
+func (ServisanModel) Delete(nomorNota int) error {
+	res := db.GetDB().Delete(&Servisan{}, nomorNota)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected < 1 {
+		return fmt.Errorf("tidak ada servisan dengan nomor nota %d", nomorNota)
+	}
+
+	return nil
+}
+
 func getTanggalPengambilan(s utils.StatusServisan) sql.NullTime {
 	if s == utils.StatusServisanJadiSudahDiambil || s == utils.StatusServisanTdkJadiSudahDiambil {
 		return sql.NullTime{
