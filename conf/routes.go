@@ -50,6 +50,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		servisanRoutes.Use(authMiddleware.MiddlewareFunc())
 		{
 			servisanRoutes.GET("/", servisanController.GetAll)
+			servisanRoutes.GET("/:nomor_nota", servisanController.GetByNomorNota)
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"shin-psmapi/db"
 	"shin-psmapi/forms"
 	"shin-psmapi/utils"
@@ -83,4 +84,20 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 	}
 
 	return servisanList, nil
+}
+
+func (ServisanModel) ByNomorNota(nomorNota int) (Servisan, error) {
+	var servisan Servisan
+
+	res := db.GetDB().Where("nomor_nota = ?", nomorNota).Find(&servisan)
+
+	if res.Error != nil {
+		return servisan, res.Error
+	}
+
+	if res.RowsAffected < 1 {
+		return servisan, fmt.Errorf("tidak ada servisan dengan nomor nota %d", nomorNota)
+	}
+
+	return servisan, nil
 }
