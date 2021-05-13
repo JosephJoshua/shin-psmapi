@@ -52,6 +52,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			servisanRoutes.GET("/", servisanController.GetAll)
 			servisanRoutes.POST("/", servisanController.Create)
 			servisanRoutes.GET("/:nomor_nota", servisanController.GetByNomorNota)
+			servisanRoutes.PUT("/:nomor_nota", servisanController.Update)
 			servisanRoutes.DELETE("/:nomor_nota", servisanController.Delete)
 		}
 	}

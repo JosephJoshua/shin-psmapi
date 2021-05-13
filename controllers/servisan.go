@@ -54,7 +54,10 @@ func (ServisanController) GetByNomorNota(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": servisan})
+	// We have to pass in a pointer to Servisan here so that the MarshalJSON of the
+	// NullTime inside Servisan gets called (MarshalJSON is only implemented for pointers),
+	// thus producing correct formatting.
+	c.JSON(http.StatusOK, gin.H{"data": &servisan})
 }
 
 func (ServisanController) Create(c *gin.Context) {
@@ -79,6 +82,35 @@ func (ServisanController) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"nomor_nota": nomorNota})
+}
+
+func (ServisanController) Update(c *gin.Context) {
+	nomorNota, err := strconv.Atoi(c.Param("nomor_nota"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Nomor nota servisan harus berupa angka"})
+		return
+	}
+
+	var form forms.UpdateServisanForm
+	if err = c.ShouldBindJSON(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid request body",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	if err = servisanModel.Update(nomorNota, form); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Gagal saat meng-update servisan",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func (ServisanController) Delete(c *gin.Context) {

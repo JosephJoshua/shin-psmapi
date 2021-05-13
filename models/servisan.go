@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"reflect"
 	"shin-psmapi/db"
 	"shin-psmapi/forms"
 	"shin-psmapi/utils"
@@ -130,6 +131,85 @@ func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err e
 	return servisan.NomorNota, err
 }
 
+func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error {
+	// "nama_pelanggan": "Joseph",
+	// "tipe_hp": "Hp keren",
+	// "no_hp": "081208120812",
+	// "kerusakan": "Hancur",
+	// "id_teknisi": 2,
+	// "id_sales": 5,
+	// "warna": "",
+	// "status": "Tidak jadi (Sudah diambil)",
+	// "imei": "1234",
+	// "yang_blm_dicek": "All",
+	// "biaya": 100000.54,
+	// "dp": 80000,
+	// "tambahan_biaya": 0.00,
+	// "diskon": 80
+
+	newServisan := make(map[string]interface{}, 26)
+
+	// servisan := Servisan{
+	// 	NamaPelanggan:      form.NamaPelanggan,
+	// 	NoHp:               form.NoHp,
+	// 	TipeHp:             form.TipeHp,
+	// 	Imei:               form.Imei,
+	// 	KondisiHp:          form.KondisiHp,
+	// 	Kerusakan:          form.Kerusakan,
+	// 	YangBlmDicek:       form.YangBlmDicek,
+	// 	Kelengkapan:        form.Kelengkapan,
+	// 	Warna:              form.Warna,
+	// 	KataSandiPola:      form.KataSandiPola,
+	// 	IDTeknisi:          form.IDTeknisi,
+	// 	IDSales:            form.IDSales,
+	// 	Status:             form.Status,
+	// 	TanggalKonfirmasi:  utils.ToNullableTime(form.TanggalKonfirmasi),
+	// 	IsiKonfirmasi:      form.IsiKonfirmasi,
+	// 	Biaya:              form.Biaya,
+	// 	Diskon:             form.Diskon,
+	// 	DP:                 form.DP,
+	// 	TambahanBiaya:      form.TambahanBiaya,
+	// 	TanggalPengambilan: getTanggalPengambilan(form.Status),
+	// }
+
+	insertToMapIfExists(form.NamaPelanggan, "nama_pelanggan", &newServisan)
+	insertToMapIfExists(form.NoHp, "no_hp", &newServisan)
+	insertToMapIfExists(form.TipeHp, "tipe_hp", &newServisan)
+	insertToMapIfExists(form.Imei, "imei", &newServisan)
+	insertToMapIfExists(form.KondisiHp, "kondisi_hp", &newServisan)
+	insertToMapIfExists(form.Kerusakan, "kerusakan", &newServisan)
+	insertToMapIfExists(form.YangBlmDicek, "yang_blm_dicek", &newServisan)
+	insertToMapIfExists(form.Kelengkapan, "kelengkapan", &newServisan)
+	insertToMapIfExists(form.Warna, "warna", &newServisan)
+	insertToMapIfExists(form.KataSandiPola, "kata_sandi_pola", &newServisan)
+	insertToMapIfExists(form.IDTeknisi, "id_teknisi", &newServisan)
+	insertToMapIfExists(form.IDSales, "id_sales", &newServisan)
+	insertToMapIfExists(form.Status, "status", &newServisan)
+	insertToMapIfExists(form.IsiKonfirmasi, "isi_konfirmasi", &newServisan)
+	insertToMapIfExists(form.Biaya, "biaya", &newServisan)
+	insertToMapIfExists(form.Diskon, "diskon", &newServisan)
+	insertToMapIfExists(form.DP, "dp", &newServisan)
+	insertToMapIfExists(form.TambahanBiaya, "tambahan_biaya", &newServisan)
+
+	newServisan["tanggal_konfirmasi"] = utils.ToNullableTime(form.TanggalKonfirmasi)
+
+	if form.Status != nil {
+		newServisan["tanggal_pengambilan"] = getTanggalPengambilan(*form.Status)
+	}
+
+	res := db.GetDB().Model(&Servisan{NomorNota: nomorNota}).Updates(newServisan)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected < 1 && len(newServisan) > 0 {
+		return fmt.Errorf("tidak ada servisan dengan nomor nota %d", nomorNota)
+	}
+
+	return nil
+}
+
 func (ServisanModel) Delete(nomorNota int) error {
 	res := db.GetDB().Delete(&Servisan{}, nomorNota)
 
@@ -142,6 +222,14 @@ func (ServisanModel) Delete(nomorNota int) error {
 	}
 
 	return nil
+}
+
+func insertToMapIfExists(formVal interface{}, key string, m *map[string]interface{}) {
+	if formVal == nil || (reflect.ValueOf(formVal).Kind() == reflect.Ptr && reflect.ValueOf(formVal).IsNil()) {
+		return
+	}
+
+	(*m)[key] = formVal
 }
 
 func getTanggalPengambilan(s utils.StatusServisan) utils.NullTime {

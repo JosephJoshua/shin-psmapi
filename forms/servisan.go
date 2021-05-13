@@ -33,3 +33,25 @@ type CreateServisanForm struct {
 	DP                float64              `json:"dp"`
 	TambahanBiaya     float64              `json:"tambahan_biaya"`
 }
+
+type UpdateServisanForm struct {
+	NamaPelanggan     *string               `json:"nama_pelanggan" binding:"omitempty,max=256"`
+	NoHp              *string               `json:"no_hp" binding:"omitempty,max=32"`
+	TipeHp            *string               `json:"tipe_hp" binding:"omitempty,max=128"`
+	Imei              *string               `json:"imei" binding:"omitempty,max=16"`
+	KondisiHp         *string               `json:"kondisi_hp" binding:"omitempty,max=512"`
+	Kerusakan         *string               `json:"kerusakan" binding:"omitempty,max=256"`
+	YangBlmDicek      *string               `json:"yang_blm_dicek" binding:"omitempty,max=128"`
+	Kelengkapan       *string               `json:"kelengkapan" binding:"omitempty,max=128"`
+	Warna             *string               `json:"warna" binding:"omitempty,max=128"`
+	KataSandiPola     *string               `json:"kata_sandi_pola" binding:"omitempty,max=128"`
+	IDTeknisi         *int                  `json:"id_teknisi" binding:"omitempty"`
+	IDSales           *int                  `json:"id_sales" binding:"omitempty"`
+	Status            *utils.StatusServisan `json:"status" binding:"omitempty,status_servisan"`
+	TanggalKonfirmasi time.Time             `json:"tanggal_konfirmasi"`
+	IsiKonfirmasi     *string               `json:"isi_konfirmasi" binding:"omitempty,max=512"`
+	Biaya             *float64              `json:"biaya" binding:"omitempty"`
+	Diskon            *int                  `json:"diskon" binding:"omitempty,min=0,max=100"`
+	DP                *float64              `json:"dp" binding:"omitempty"`
+	TambahanBiaya     *float64              `json:"tambahan_biaya" binding:"omitempty"`
+}
