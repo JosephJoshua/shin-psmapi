@@ -132,45 +132,7 @@ func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err e
 }
 
 func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error {
-	// "nama_pelanggan": "Joseph",
-	// "tipe_hp": "Hp keren",
-	// "no_hp": "081208120812",
-	// "kerusakan": "Hancur",
-	// "id_teknisi": 2,
-	// "id_sales": 5,
-	// "warna": "",
-	// "status": "Tidak jadi (Sudah diambil)",
-	// "imei": "1234",
-	// "yang_blm_dicek": "All",
-	// "biaya": 100000.54,
-	// "dp": 80000,
-	// "tambahan_biaya": 0.00,
-	// "diskon": 80
-
 	newServisan := make(map[string]interface{}, 26)
-
-	// servisan := Servisan{
-	// 	NamaPelanggan:      form.NamaPelanggan,
-	// 	NoHp:               form.NoHp,
-	// 	TipeHp:             form.TipeHp,
-	// 	Imei:               form.Imei,
-	// 	KondisiHp:          form.KondisiHp,
-	// 	Kerusakan:          form.Kerusakan,
-	// 	YangBlmDicek:       form.YangBlmDicek,
-	// 	Kelengkapan:        form.Kelengkapan,
-	// 	Warna:              form.Warna,
-	// 	KataSandiPola:      form.KataSandiPola,
-	// 	IDTeknisi:          form.IDTeknisi,
-	// 	IDSales:            form.IDSales,
-	// 	Status:             form.Status,
-	// 	TanggalKonfirmasi:  utils.ToNullableTime(form.TanggalKonfirmasi),
-	// 	IsiKonfirmasi:      form.IsiKonfirmasi,
-	// 	Biaya:              form.Biaya,
-	// 	Diskon:             form.Diskon,
-	// 	DP:                 form.DP,
-	// 	TambahanBiaya:      form.TambahanBiaya,
-	// 	TanggalPengambilan: getTanggalPengambilan(form.Status),
-	// }
 
 	insertToMapIfExists(form.NamaPelanggan, "nama_pelanggan", &newServisan)
 	insertToMapIfExists(form.NoHp, "no_hp", &newServisan)
