@@ -54,8 +54,17 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 	)
 
 	if form.SearchBy != utils.ServisanReturnAll {
-		query += "LOWER(?) LIKE '%' || ? || '%'"
-		params = append(params, string(form.SearchBy), form.SearchQuery)
+		if form.SearchBy == utils.ServisanSearchByNomorNota {
+			query += "nomor_nota::TEXT LIKE '%' || ? || '%'"
+		} else if form.SearchBy == utils.ServisanSearchByStatus {
+			query += "LOWER(status::TEXT) LIKE '%' || LOWER(?) || '%'"
+		} else {
+			// form.SearchBy has been validated beforehand so this
+			// shouldn't be vulnerable to SQL injection, AFAIK.
+			query += "LOWER(" + string(form.SearchBy) + ") LIKE '%' || LOWER(?) || '%'"
+		}
+
+		params = append(params, form.SearchQuery)
 	}
 
 	if !form.MinDate.IsZero() {
