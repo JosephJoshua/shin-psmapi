@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"net/http"
-	"shin-psmapi/forms"
-	"shin-psmapi/models"
 	"strconv"
 
+	"github.com/JosephJoshua/shin-psmapi/forms"
+	"github.com/JosephJoshua/shin-psmapi/models"
 	"github.com/gin-gonic/gin"
 )
 

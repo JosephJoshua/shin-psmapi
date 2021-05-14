@@ -1,11 +1,11 @@
 package conf
 
 import (
-	"shin-psmapi/forms"
-	"shin-psmapi/models"
-	"shin-psmapi/utils"
 	"time"
 
+	"github.com/JosephJoshua/shin-psmapi/forms"
+	"github.com/JosephJoshua/shin-psmapi/models"
+	"github.com/JosephJoshua/shin-psmapi/utils"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )

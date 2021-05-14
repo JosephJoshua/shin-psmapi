@@ -2,10 +2,10 @@ package models
 
 import (
 	"errors"
-	"shin-psmapi/db"
-	"shin-psmapi/forms"
-	"shin-psmapi/utils"
 
+	"github.com/JosephJoshua/shin-psmapi/db"
+	"github.com/JosephJoshua/shin-psmapi/forms"
+	"github.com/JosephJoshua/shin-psmapi/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

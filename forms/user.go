@@ -1,6 +1,6 @@
 package forms
 
-import "shin-psmapi/utils"
+import "github.com/JosephJoshua/shin-psmapi/utils"
 
 type LoginForm struct {
 	Email    string `json:"email" binding:"required,email,max=256"`

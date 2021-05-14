@@ -1,4 +1,4 @@
-module shin-psmapi
+module github.com/JosephJoshua/shin-psmapi
 
 go 1.16
 

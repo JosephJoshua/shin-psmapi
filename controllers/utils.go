@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"shin-psmapi/db"
-	"shin-psmapi/models"
-	"shin-psmapi/utils"
 
+	"github.com/JosephJoshua/shin-psmapi/db"
+	"github.com/JosephJoshua/shin-psmapi/models"
+	"github.com/JosephJoshua/shin-psmapi/utils"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )

@@ -4,8 +4,7 @@
 package conf
 
 import (
-	"shin-psmapi/models"
-
+	"github.com/JosephJoshua/shin-psmapi/models"
 	"gorm.io/gorm"
 )
 

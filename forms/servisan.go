@@ -1,8 +1,9 @@
 package forms
 
 import (
-	"shin-psmapi/utils"
 	"time"
+
+	"github.com/JosephJoshua/shin-psmapi/utils"
 )
 
 type GetAllServisanForm struct {

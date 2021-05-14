@@ -3,10 +3,11 @@ package models
 import (
 	"fmt"
 	"reflect"
-	"shin-psmapi/db"
-	"shin-psmapi/forms"
-	"shin-psmapi/utils"
 	"time"
+
+	"github.com/JosephJoshua/shin-psmapi/db"
+	"github.com/JosephJoshua/shin-psmapi/forms"
+	"github.com/JosephJoshua/shin-psmapi/utils"
 )
 
 type Servisan struct {

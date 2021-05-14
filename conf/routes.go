@@ -1,8 +1,7 @@
 package conf
 
 import (
-	"shin-psmapi/controllers"
-
+	"github.com/JosephJoshua/shin-psmapi/controllers"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
