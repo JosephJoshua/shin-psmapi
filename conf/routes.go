@@ -16,6 +16,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		salesController := controllers.SalesController{}
 		teknisiController := controllers.TeknisiController{}
 		servisanController := controllers.ServisanController{}
+		sparepartController := controllers.SparepartController{}
 
 		api.POST("/login", authMiddleware.LoginHandler)
 
@@ -54,6 +55,15 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			servisanRoutes.GET("/:nomor_nota", servisanController.GetByNomorNota)
 			servisanRoutes.PUT("/:nomor_nota", servisanController.Update)
 			servisanRoutes.DELETE("/:nomor_nota", servisanController.Delete)
+		}
+
+		sparepartRoutes := api.Group("/sparepart")
+		sparepartRoutes.Use(authMiddleware.MiddlewareFunc())
+		{
+			sparepartRoutes.GET("/", sparepartController.GetAll)
+			sparepartRoutes.POST("/", sparepartController.Create)
+			sparepartRoutes.GET("/:nomor_nota", sparepartController.GetByNomorNota)
+			sparepartRoutes.DELETE("/:id", sparepartController.Delete)
 		}
 	}
 }
