@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"shin-psmapi/conf"
 	"shin-psmapi/db"
 	"shin-psmapi/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -13,6 +16,17 @@ import (
 )
 
 func main() {
+	dateStr := time.Now().Format("2006-01-02")
+	logFile, err := os.Create(fmt.Sprintf("logs/%v.log", dateStr))
+
+	if err != nil {
+		log.Fatal("Unable to create log file:\n" + err.Error())
+		return
+	}
+
+	defer logFile.Close()
+	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
+
 	r := gin.Default()
 
 	db.Init()
