@@ -28,8 +28,8 @@ func (TeknisiModel) All(searchQuery string) ([]Teknisi, error) {
 	return teknisiList, nil
 }
 
-func (TeknisiModel) ByID(id int) (Teknisi, error) {
-	var teknisi Teknisi
+func (TeknisiModel) ByID(id int) (*Teknisi, error) {
+	var teknisi *Teknisi
 
 	res := db.GetDB().Where("id = ?", id).Find(&teknisi)
 
@@ -38,7 +38,7 @@ func (TeknisiModel) ByID(id int) (Teknisi, error) {
 	}
 
 	if res.RowsAffected < 1 {
-		return Teknisi{}, fmt.Errorf("tidak ada teknisi dengan ID %d", id)
+		return &Teknisi{}, fmt.Errorf("tidak ada teknisi dengan ID %d", id)
 	}
 
 	return teknisi, nil

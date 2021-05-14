@@ -24,8 +24,8 @@ func (SalesModel) All(searchQuery string) ([]Sales, error) {
 	return salesList, nil
 }
 
-func (SalesModel) ByID(id int) (Sales, error) {
-	var sales Sales
+func (SalesModel) ByID(id int) (*Sales, error) {
+	var sales *Sales
 
 	res := db.GetDB().Where("id = ?", id).Find(&sales)
 
@@ -34,7 +34,7 @@ func (SalesModel) ByID(id int) (Sales, error) {
 	}
 
 	if res.RowsAffected < 1 {
-		return Sales{}, fmt.Errorf("tidak ada sales dengan ID %d", id)
+		return &Sales{}, fmt.Errorf("tidak ada sales dengan ID %d", id)
 	}
 
 	return sales, nil
