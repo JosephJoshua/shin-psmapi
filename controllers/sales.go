@@ -58,6 +58,11 @@ func (SalesController) GetByID(c *gin.Context) {
 }
 
 func (SalesController) Create(c *gin.Context) {
+	if !HasAdminRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Hanya admin yang dapat membuat sales baru"})
+		return
+	}
+
 	var form forms.CreateSalesForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -82,6 +87,11 @@ func (SalesController) Create(c *gin.Context) {
 }
 
 func (SalesController) Delete(c *gin.Context) {
+	if !HasAdminRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Hanya admin yang dapat menghapus sales"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "ID sales harus berupa angka"})

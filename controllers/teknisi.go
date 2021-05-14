@@ -58,6 +58,11 @@ func (TeknisiController) GetByID(c *gin.Context) {
 }
 
 func (TeknisiController) Create(c *gin.Context) {
+	if !HasAdminRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Hanya admin yang dapat membuat teknisi baru"})
+		return
+	}
+
 	var form forms.CreateTeknisiForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -82,6 +87,11 @@ func (TeknisiController) Create(c *gin.Context) {
 }
 
 func (TeknisiController) Delete(c *gin.Context) {
+	if !HasAdminRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Hanya admin yang dapat menghapus teknisi"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "ID teknisi harus berupa angka"})
