@@ -10,8 +10,6 @@ import (
 )
 
 func MigrateDB(db *gorm.DB) {
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Sales{})
-	db.AutoMigrate(&models.Teknisi{})
-	db.AutoMigrate(&models.Servisan{})
+	db.AutoMigrate(&models.User{}, &models.Sales{}, &models.Teknisi{},
+		&models.Servisan{}, &models.Sparepart{})
 }
