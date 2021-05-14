@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"os"
 	"time"
 
 	"github.com/JosephJoshua/shin-psmapi/forms"
@@ -15,7 +16,7 @@ var JWTMiddleware *jwt.GinJWTMiddleware
 func InitJWTMiddleware() (*jwt.GinJWTMiddleware, error) {
 	JWTMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:         utils.JWTRealm,
-		Key:           []byte("very very very secret key"),
+		Key:           []byte(os.Getenv("JWT_KEY")),
 		Timeout:       time.Hour * 24,
 		MaxRefresh:    time.Hour,
 		IdentityKey:   utils.JWTIdentityKey,

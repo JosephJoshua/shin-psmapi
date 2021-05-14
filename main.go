@@ -13,9 +13,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Failed to load .env file")
+		return
+	}
+
 	dateStr := time.Now().Format("2006-01-02")
 	logFile, err := os.Create(fmt.Sprintf("logs/%v.log", dateStr))
 
@@ -41,12 +48,7 @@ func main() {
 
 	setupValidators()
 
-	port, ok := os.LookupEnv("PORT")
-	if !ok {
-		port = "3030"
-	}
-
-	if err := r.Run(":" + port); err != nil {
+	if err := r.Run(); err != nil {
 		log.Panic(err.Error())
 	}
 }
