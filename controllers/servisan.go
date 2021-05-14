@@ -57,7 +57,7 @@ func (ServisanController) GetByNomorNota(c *gin.Context) {
 	// We have to pass in a pointer to Servisan here so that the MarshalJSON of the
 	// NullTime inside Servisan gets called (MarshalJSON is only implemented for pointers),
 	// thus producing correct formatting.
-	c.JSON(http.StatusOK, gin.H{"data": &servisan})
+	c.JSON(http.StatusOK, gin.H{"data": servisan})
 }
 
 func (ServisanController) Create(c *gin.Context) {

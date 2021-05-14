@@ -87,8 +87,8 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 	return servisanList, nil
 }
 
-func (ServisanModel) ByNomorNota(nomorNota int) (Servisan, error) {
-	var servisan Servisan
+func (ServisanModel) ByNomorNota(nomorNota int) (*Servisan, error) {
+	var servisan *Servisan
 
 	res := db.GetDB().Where("nomor_nota = ?", nomorNota).Find(&servisan)
 
