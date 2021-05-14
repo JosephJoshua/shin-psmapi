@@ -29,6 +29,12 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			authRoutes.GET("/refresh_token", authMiddleware.RefreshHandler)
 		}
 
+		userRoutes := api.Group("/users")
+		userRoutes.Use(authMiddleware.MiddlewareFunc())
+		{
+			userRoutes.GET("/", userController.GetAll)
+		}
+
 		salesRoutes := api.Group("/sales")
 		salesRoutes.Use(authMiddleware.MiddlewareFunc())
 		{

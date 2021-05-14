@@ -32,6 +32,13 @@ func AuthenticateUser(form forms.LoginForm) (interface{}, error) {
 	return user, nil
 }
 
+func (UserModel) All() ([]User, error) {
+	var userList []User
+	err := db.GetDB().Find(&userList).Error
+
+	return userList, err
+}
+
 func (UserModel) Register(form forms.RegisterForm) (User, error) {
 	db := db.GetDB()
 
