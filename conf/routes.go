@@ -7,8 +7,6 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
-	r.Static("/public", "./public")
-
 	api := r.Group("/api")
 	{
 		userController := controllers.UserController{}
