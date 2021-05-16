@@ -5,6 +5,8 @@ import (
 
 	"github.com/JosephJoshua/shin-psmapi/forms"
 	"github.com/JosephJoshua/shin-psmapi/models"
+	"github.com/JosephJoshua/shin-psmapi/utils"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,6 +31,35 @@ func (UserController) GetAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": userList})
+}
+
+func (UserController) GetLoggedInUser(c *gin.Context) {
+	id, ok := jwt.ExtractClaims(c)[utils.JWTIdentityKey].(float64)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ID user yang di dalam claim JWT tidak valid",
+		})
+
+		return
+	}
+
+	user, err := userModel.One(int(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Gagal mengambil user",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	// We don't want to return the password
+	c.JSON(http.StatusOK, gin.H{"data": gin.H{
+		"id":       user.ID,
+		"email":    user.Email,
+		"username": user.Username,
+		"role":     user.Role,
+	}})
 }
 
 func (UserController) Register(c *gin.Context) {

@@ -32,6 +32,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		userRoutes.Use(authMiddleware.MiddlewareFunc())
 		{
 			userRoutes.GET("/", userController.GetAll)
+			userRoutes.GET("/current", userController.GetLoggedInUser)
 		}
 
 		salesRoutes := api.Group("/sales")

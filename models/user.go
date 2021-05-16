@@ -39,6 +39,13 @@ func (UserModel) All() ([]User, error) {
 	return userList, err
 }
 
+func (UserModel) One(id int) (User, error) {
+	var user User
+	err := db.GetDB().Where("id = ?", id).Select("id", "email", "username", "role").Find(&user).Error
+
+	return user, err
+}
+
 func (UserModel) Register(form forms.RegisterForm) (User, error) {
 	db := db.GetDB()
 
