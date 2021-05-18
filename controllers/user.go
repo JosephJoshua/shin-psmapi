@@ -30,7 +30,7 @@ func (UserController) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": userList})
+	c.JSON(http.StatusOK, userList)
 }
 
 func (UserController) GetLoggedInUser(c *gin.Context) {
@@ -54,12 +54,12 @@ func (UserController) GetLoggedInUser(c *gin.Context) {
 	}
 
 	// We don't want to return the password
-	c.JSON(http.StatusOK, gin.H{"data": gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"id":       user.ID,
 		"email":    user.Email,
 		"username": user.Username,
 		"role":     user.Role,
-	}})
+	})
 }
 
 func (UserController) Register(c *gin.Context) {
@@ -81,5 +81,5 @@ func (UserController) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": user})
+	c.JSON(http.StatusCreated, user)
 }

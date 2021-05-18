@@ -34,7 +34,7 @@ func (SparepartController) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": sparepartList})
+	c.JSON(http.StatusOK, sparepartList)
 }
 
 func (SparepartController) GetByNomorNota(c *gin.Context) {
@@ -54,7 +54,7 @@ func (SparepartController) GetByNomorNota(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": sparepartList})
+	c.JSON(http.StatusOK, sparepartList)
 }
 
 func (SparepartController) Create(c *gin.Context) {
@@ -78,7 +78,7 @@ func (SparepartController) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, id)
 }
 
 func (SparepartController) Delete(c *gin.Context) {

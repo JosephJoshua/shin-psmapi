@@ -34,7 +34,7 @@ func (SalesController) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": salesList})
+	c.JSON(http.StatusOK, salesList)
 }
 
 func (SalesController) GetByID(c *gin.Context) {
@@ -54,7 +54,7 @@ func (SalesController) GetByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": sales})
+	c.JSON(http.StatusOK, sales)
 }
 
 func (SalesController) Create(c *gin.Context) {
@@ -83,7 +83,7 @@ func (SalesController) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, id)
 }
 
 func (SalesController) Delete(c *gin.Context) {
