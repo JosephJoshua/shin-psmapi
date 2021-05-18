@@ -90,7 +90,7 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
 	}
 
-	if err := db.GetDB().Where(query, params...).Find(&servisanList).Error; err != nil {
+	if err := db.GetDB().Where(query, params...).Order("nomor_nota ASC").Find(&servisanList).Error; err != nil {
 		return servisanList, err
 	}
 
