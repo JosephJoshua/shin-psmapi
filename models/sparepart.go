@@ -60,15 +60,7 @@ func (SparepartModel) ByNomorNota(nomorNota int) ([]Sparepart, error) {
 	var sparepartList []Sparepart
 	res := db.GetDB().Where("nomor_nota = ?", nomorNota).Find(&sparepartList)
 
-	if res.Error != nil {
-		return sparepartList, res.Error
-	}
-
-	if res.RowsAffected < 1 {
-		return sparepartList, fmt.Errorf("tidak ada sparepart yang dibeli untuk servisan dengan nomor nota %d", nomorNota)
-	}
-
-	return sparepartList, nil
+	return sparepartList, res.Error
 }
 
 func (SparepartModel) Create(form forms.CreateSparepartForm) (id int, err error) {
