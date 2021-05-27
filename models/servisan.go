@@ -66,28 +66,29 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 		}
 
 		params = append(params, form.SearchQuery)
-	}
+	} else {
+		// We only want to filter based on date range when the search query is empty.
+		if !form.MinDate.IsZero() {
+			if len(params) > 0 {
+				query += " AND "
+			}
 
-	if !form.MinDate.IsZero() {
-		if len(params) > 0 {
-			query += " AND "
+			query += "tanggal >= ?"
+
+			// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+			params = append(params, utils.ToRFC3339TimeString(form.MinDate))
 		}
 
-		query += "tanggal >= ?"
+		if !form.MaxDate.IsZero() {
+			if len(params) > 0 {
+				query += " AND "
+			}
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
-	}
+			query += "tanggal <= ?"
 
-	if !form.MaxDate.IsZero() {
-		if len(params) > 0 {
-			query += " AND "
+			// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+			params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
 		}
-
-		query += "tanggal <= ?"
-
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
 	}
 
 	if err := db.GetDB().Where(query, params...).Order("nomor_nota ASC").Find(&servisanList).Error; err != nil {
