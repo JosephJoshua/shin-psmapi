@@ -9,7 +9,7 @@ const (
 	ServisanSearchByNama      ServisanSearchBy = "nama_pelanggan"
 	ServisanSearchByNomorNota ServisanSearchBy = "nomor_nota"
 	ServisanSearchByStatus    ServisanSearchBy = "status"
-	ServisanSearchByNomorHp   ServisanSearchBy = "nomor_hp"
+	ServisanSearchByNomorHp   ServisanSearchBy = "no_hp"
 	ServisanSearchByTipeHp    ServisanSearchBy = "tipe_hp"
 )
 
