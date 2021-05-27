@@ -54,6 +54,11 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 		params       []interface{}
 	)
 
+	// Search by nama pelanggan by default if a 'search by' column wasn't provided.
+	if form.SearchQuery != "" && form.SearchBy == utils.ServisanReturnAll {
+		form.SearchBy = utils.ServisanSearchByNama
+	}
+
 	if form.SearchBy != utils.ServisanReturnAll {
 		if form.SearchBy == utils.ServisanSearchByNomorNota {
 			query += "nomor_nota::TEXT LIKE '%' || ? || '%'"
