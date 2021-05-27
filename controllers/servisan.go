@@ -111,6 +111,11 @@ func (ServisanController) Update(c *gin.Context) {
 }
 
 func (ServisanController) Delete(c *gin.Context) {
+	if !HasAdminRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Hanya admin yang dapat menghapus servisan"})
+		return
+	}
+
 	nomorNota, err := strconv.Atoi(c.Param("nomor_nota"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Nomor nota servisan harus berupa angka"})
