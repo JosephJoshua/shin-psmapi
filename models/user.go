@@ -21,8 +21,14 @@ type UserModel struct{}
 
 func AuthenticateUser(form forms.LoginForm) (interface{}, error) {
 	var user User
-	if err := db.GetDB().Where("email=LOWER(?)", form.Email).First(&user).Error; err != nil {
-		return nil, err
+	res := db.GetDB().Where("email=LOWER(?)", form.Email).Find(&user)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	if res.RowsAffected < 1 {
+		return nil, errors.New("email atau password salah")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password)); err != nil {
