@@ -96,7 +96,7 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 		}
 	}
 
-	if err := db.GetDB().Where(query, params...).Order("nomor_nota ASC").Find(&servisanList).Error; err != nil {
+	if err := db.GetDB().Where(query, params...).Order("nomor_nota DESC").Find(&servisanList).Error; err != nil {
 		return servisanList, err
 	}
 
