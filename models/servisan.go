@@ -28,6 +28,8 @@ type Servisan struct {
 	Teknisi            Teknisi              `json:"-" gorm:"foreignKey:IDTeknisi;constraint:OnDelete:RESTRICT;"`
 	Sales              Sales                `json:"-" gorm:"foreignKey:IDSales;constraint:OnDelete:RESTRICT;"`
 	Status             utils.StatusServisan `json:"status" gorm:"type:status_servisan;not null"`
+	NamaTeknisi        string               `json:"nama_teknisi" gorm:"->"`
+	NamaSales          string               `json:"nama_sales" gorm:"->"`
 	TanggalKonfirmasi  utils.NullTime       `json:"tanggal_konfirmasi" gorm:"type:timestamp with time zone"`
 	IsiKonfirmasi      string               `json:"isi_konfirmasi" gorm:"size:512"`
 	Biaya              float64              `json:"biaya" gorm:"type:double precision;not null;default:0"`
@@ -96,7 +98,15 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 		}
 	}
 
-	if err := db.GetDB().Where(query, params...).Order("nomor_nota DESC").Find(&servisanList).Error; err != nil {
+	err := db.GetDB().
+		Model(&Servisan{}).
+		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales").
+		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
+		Joins("LEFT JOIN sales ON servisan.id_sales = sales.id").
+		Where(query, params...).
+		Order("nomor_nota DESC").Find(&servisanList).Error
+
+	if err != nil {
 		return servisanList, err
 	}
 
@@ -106,7 +116,12 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 func (ServisanModel) ByNomorNota(nomorNota int) (*Servisan, error) {
 	var servisan *Servisan
 
-	res := db.GetDB().Where("nomor_nota = ?", nomorNota).Find(&servisan)
+	res := db.GetDB().
+		Model(&Servisan{}).
+		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales").
+		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
+		Joins("LEFT JOIN sales on servisan.id_sales = sales.id").
+		Where("nomor_nota = ?", nomorNota).Find(&servisan)
 
 	if res.Error != nil {
 		return servisan, res.Error
