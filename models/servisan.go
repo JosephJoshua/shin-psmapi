@@ -104,7 +104,7 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
 		Joins("LEFT JOIN sales ON servisan.id_sales = sales.id").
 		Where(query, params...).
-		Order("nomor_nota DESC").Find(&servisanList).Error
+		Order("nomor_nota ASC").Find(&servisanList).Error
 
 	if err != nil {
 		return servisanList, err
