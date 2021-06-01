@@ -205,7 +205,13 @@ func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error 
 }
 
 func (ServisanModel) Delete(nomorNota int) error {
-	res := db.GetDB().Delete(&Servisan{}, nomorNota)
+    db := db.GetDB()
+    
+    if err := db.Delete(&Sparepart{}, "nomor_nota = ?", nomorNota).Error; err != nil {
+        return err
+    }
+    
+	res := db.Delete(&Servisan{}, nomorNota)
 
 	if res.Error != nil {
 		return res.Error
