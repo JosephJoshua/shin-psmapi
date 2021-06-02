@@ -17,25 +17,14 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Failed to load .env file")
-		return
-	}
+	loadDotEnvFile()
 
-	dateStr := time.Now().Format("2006-01-02")
-	logFile, err := os.Create(fmt.Sprintf("logs/%v.log", dateStr))
-
-	if err != nil {
-		log.Fatal("Unable to create log file:\n" + err.Error())
-		return
-	}
-
+	logFile := createLogFile()
 	defer logFile.Close()
+
 	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
 
 	r := gin.Default()
-
 	db.Init()
 
 	authMiddleware, err := conf.InitJWTMiddleware()
@@ -51,6 +40,33 @@ func main() {
 	if err := r.Run(); err != nil {
 		log.Panic(err.Error())
 	}
+}
+
+func loadDotEnvFile() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Failed to load .env file")
+		return
+	}
+}
+
+func createLogFile() *os.File {
+	dateStr := time.Now().Format("2006-01-02")
+	filePath := fmt.Sprintf("logs/%v.log", dateStr)
+
+	// Open a file with append mode if it exists; if it doesn't, create it.
+	logFile, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal("Unable to create log file:\n" + err.Error())
+		return nil
+	}
+
+	if _, err := logFile.WriteString("\n"); err != nil {
+		log.Fatal("Unable to write to log file:\n" + err.Error())
+		return nil
+	}
+
+	return logFile
 }
 
 func setupValidators() {
