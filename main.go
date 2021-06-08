@@ -55,7 +55,7 @@ func createLogFile() *os.File {
 	filePath := fmt.Sprintf("logs/%v.log", dateStr)
 
 	// Open a file with append mode if it exists; if it doesn't, create it.
-	logFile, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal("Unable to create log file:\n" + err.Error())
 		return nil
