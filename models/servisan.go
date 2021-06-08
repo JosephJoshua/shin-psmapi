@@ -61,7 +61,7 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 		form.SearchBy = utils.ServisanSearchByNama
 	}
 
-	if form.SearchBy != utils.ServisanReturnAll {
+	if form.SearchBy != utils.ServisanReturnAll || form.SearchQuery == "" {
 		if form.SearchBy == utils.ServisanSearchByNomorNota {
 			query += "nomor_nota::TEXT LIKE '%' || ? || '%'"
 		} else if form.SearchBy == utils.ServisanSearchByStatus {
