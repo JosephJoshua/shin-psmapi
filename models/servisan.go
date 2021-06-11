@@ -156,7 +156,6 @@ func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err e
 		DP:                 form.DP,
 		TambahanBiaya:      form.TambahanBiaya,
 		TanggalPengambilan: getTanggalPengambilan(form.Status),
-		LabaRugi:           (100.0-float64(form.Diskon))/100.0*form.Biaya + form.TambahanBiaya,
 	}
 
 	err = db.GetDB().Create(&servisan).Error
