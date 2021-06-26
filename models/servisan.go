@@ -186,17 +186,22 @@ func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error 
 
 	newServisan["tanggal_konfirmasi"] = utils.ToNullableTime(form.TanggalKonfirmasi)
 
-	var oldStatus *utils.StatusServisan
-	if err := db.GetDB().Model(&Servisan{}).Select("status").Where("nomor_nota = ?", nomorNota).Find(&oldStatus).Error; err != nil {
-		return err
+	var oldStatus []utils.StatusServisan
+
+	res := db.GetDB().Model(&Servisan{}).Where("nomor_nota = ?", nomorNota).Pluck("status", &oldStatus)
+	if res.Error != nil {
+		return res.Error
 	}
 
-	if form.Status != nil && *oldStatus != *form.Status {
+	if res.RowsAffected < 1 {
+		return fmt.Errorf("tidak ada servisan dengan nomor nota %d", nomorNota)
+	}
+
+	if form.Status != nil && oldStatus[0] != *form.Status {
 		newServisan["tanggal_pengambilan"] = getTanggalPengambilan(*form.Status)
 	}
 
-	res := db.GetDB().Model(&Servisan{NomorNota: nomorNota}).Updates(newServisan)
-
+	res = db.GetDB().Model(&Servisan{NomorNota: nomorNota}).Updates(newServisan)
 	if res.Error != nil {
 		return res.Error
 	}
