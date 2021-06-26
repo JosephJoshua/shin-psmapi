@@ -191,7 +191,7 @@ func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error 
 		return err
 	}
 
-	if form.Status != nil && oldStatus != form.Status {
+	if form.Status != nil && *oldStatus != *form.Status {
 		newServisan["tanggal_pengambilan"] = getTanggalPengambilan(*form.Status)
 	}
 
