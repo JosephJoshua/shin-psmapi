@@ -186,7 +186,12 @@ func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error 
 
 	newServisan["tanggal_konfirmasi"] = utils.ToNullableTime(form.TanggalKonfirmasi)
 
-	if form.Status != nil {
+	var oldStatus *utils.StatusServisan
+	if err := db.GetDB().Model(&Servisan{}).Select("status").Where("nomor_nota = ?", nomorNota).Find(&oldStatus).Error; err != nil {
+		return err
+	}
+
+	if form.Status != nil && oldStatus != form.Status {
 		newServisan["tanggal_pengambilan"] = getTanggalPengambilan(*form.Status)
 	}
 
@@ -204,12 +209,12 @@ func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error 
 }
 
 func (ServisanModel) Delete(nomorNota int) error {
-    db := db.GetDB()
-    
-    if err := db.Delete(&Sparepart{}, "nomor_nota = ?", nomorNota).Error; err != nil {
-        return err
-    }
-    
+	db := db.GetDB()
+
+	if err := db.Delete(&Sparepart{}, "nomor_nota = ?", nomorNota).Error; err != nil {
+		return err
+	}
+
 	res := db.Delete(&Servisan{}, nomorNota)
 
 	if res.Error != nil {
@@ -231,8 +236,8 @@ func insertToMapIfExists(formVal interface{}, key string, m *map[string]interfac
 	(*m)[key] = formVal
 }
 
-func getTanggalPengambilan(s utils.StatusServisan) utils.NullTime {
-	if s == utils.StatusServisanJadiSudahDiambil || s == utils.StatusServisanTdkJadiSudahDiambil {
+func getTanggalPengambilan(status utils.StatusServisan) utils.NullTime {
+	if status == utils.StatusServisanJadiSudahDiambil || status == utils.StatusServisanTdkJadiSudahDiambil {
 		return utils.NullTime{
 			Time:  time.Now(),
 			Valid: true,
