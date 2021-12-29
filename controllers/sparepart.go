@@ -58,6 +58,11 @@ func (SparepartController) GetByNomorNota(c *gin.Context) {
 }
 
 func (SparepartController) Create(c *gin.Context) {
+	if HasCustomerServiceRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Customer service tidak dapat menambah sparepart"})
+		return
+	}
+
 	var form forms.CreateSparepartForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -82,6 +87,11 @@ func (SparepartController) Create(c *gin.Context) {
 }
 
 func (SparepartController) Delete(c *gin.Context) {
+	if HasCustomerServiceRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Customer service tidak dapat menghapus sparepart"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "ID sparepart harus berupa angka"})

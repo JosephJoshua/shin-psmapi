@@ -58,6 +58,11 @@ func (ServisanController) GetByNomorNota(c *gin.Context) {
 }
 
 func (ServisanController) Create(c *gin.Context) {
+	if HasBuyerRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Buyer tidak dapat menambah servisan"})
+		return
+	}
+
 	var form forms.CreateServisanForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -82,6 +87,11 @@ func (ServisanController) Create(c *gin.Context) {
 }
 
 func (ServisanController) Update(c *gin.Context) {
+	if HasBuyerRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Buyer tidak dapat merubah servisan"})
+		return
+	}
+
 	nomorNota, err := strconv.Atoi(c.Param("nomor_nota"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Nomor nota servisan harus berupa angka"})

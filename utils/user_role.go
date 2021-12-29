@@ -11,10 +11,12 @@ type UserRole string
 const (
 	AdminUserRole           UserRole = "admin"
 	CustomerServiceUserRole UserRole = "customer_service"
+	BuyerUserRole 			UserRole = "buyer"
 )
 
 func IsValidUserRole(r string) bool {
-	return r == string(AdminUserRole) || r == string(CustomerServiceUserRole)
+	return r == string(AdminUserRole) || r == string(CustomerServiceUserRole) || 
+		r == string(BuyerUserRole)
 }
 
 func (r *UserRole) Scan(value interface{}) error {

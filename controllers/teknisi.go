@@ -14,6 +14,11 @@ type TeknisiController struct{}
 var teknisiModel = new(models.TeknisiModel)
 
 func (TeknisiController) GetAll(c *gin.Context) {
+	if HasBuyerRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Buyer tidak dapat melihat teknisi"})
+		return
+	}
+
 	form := forms.GetAllTeknisiForm{}
 	if err := c.ShouldBindQuery(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -38,6 +43,11 @@ func (TeknisiController) GetAll(c *gin.Context) {
 }
 
 func (TeknisiController) GetByID(c *gin.Context) {
+	if HasBuyerRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Buyer tidak dapat melihat teknisi"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "ID teknisi harus berupa angka"})

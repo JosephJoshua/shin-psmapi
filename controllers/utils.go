@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/JosephJoshua/shin-psmapi/db"
 	"github.com/JosephJoshua/shin-psmapi/models"
 	"github.com/JosephJoshua/shin-psmapi/utils"
@@ -10,13 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HasAdminRole(c *gin.Context) bool {
+func GetUserRole(c *gin.Context) utils.UserRole {
 	claims := jwt.ExtractClaims(c)
 
 	var user models.User
 	db.GetDB().Select("role").Where("id = ?", claims[utils.JWTIdentityKey]).First(&user)
 
-	fmt.Println(user)
+	return user.Role
+}
 
-	return user.Role == utils.AdminUserRole
+func HasAdminRole(c *gin.Context) bool {
+	return GetUserRole(c) == utils.AdminUserRole
+}
+
+func HasBuyerRole(c *gin.Context) bool {
+	return GetUserRole(c) == utils.BuyerUserRole
+}
+
+func HasCustomerServiceRole(c *gin.Context) bool {
+	return GetUserRole(c) == utils.CustomerServiceUserRole
 }

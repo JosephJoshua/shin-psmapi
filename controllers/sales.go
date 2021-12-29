@@ -14,6 +14,11 @@ type SalesController struct{}
 var salesModel = new(models.SalesModel)
 
 func (SalesController) GetAll(c *gin.Context) {
+	if HasBuyerRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Buyer tidak dapat melihat sales"})
+		return
+	}
+
 	form := forms.GetAllSalesForm{}
 	if err := c.ShouldBindQuery(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -38,6 +43,11 @@ func (SalesController) GetAll(c *gin.Context) {
 }
 
 func (SalesController) GetByID(c *gin.Context) {
+	if HasBuyerRole(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Buyer tidak dapat melihat sales"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "ID sales harus berupa angka"})
