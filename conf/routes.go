@@ -57,6 +57,8 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		servisanRoutes.GET("/:nomor_nota", servisanController.GetByNomorNota)
 		servisanRoutes.PUT("/:nomor_nota", servisanController.Update)
 		servisanRoutes.DELETE("/:nomor_nota", servisanController.Delete)
+		servisanRoutes.GET("/laba-rugi-report", servisanController.GetLabaRugiReport)
+		servisanRoutes.GET("/teknisi-report", servisanController.GetTeknisiReport)
 	}
 
 	sparepartRoutes := r.Group("/sparepart")

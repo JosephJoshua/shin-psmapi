@@ -37,6 +37,54 @@ func (ServisanController) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, servisanList)
 }
 
+func (ServisanController) GetLabaRugiReport(c *gin.Context) {
+	form := forms.ServisanLabaRugiReportForm{}
+	if err := c.ShouldBindQuery(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid query parameters",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	report, err := servisanModel.LabaRugiReport(form)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Gagal saat mengambil servisan",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, report)
+}
+
+func (ServisanController) GetTeknisiReport(c *gin.Context) {
+	form := forms.ServisanTeknisiReportForm{}
+	if err := c.ShouldBindQuery(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid query parameters",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	report, err := servisanModel.TeknisiReport(form)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Gagal saat mengambil servisan",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, report)
+}
+
 func (ServisanController) GetByNomorNota(c *gin.Context) {
 	nomorNota, err := strconv.Atoi(c.Param("nomor_nota"))
 	if err != nil {
