@@ -167,7 +167,7 @@ func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]La
 			query += " AND "
 		}
 
-		query += "tanggal >= ?"
+		query += "tanggal_pengambilan >= ?"
 
 		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
 		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
@@ -178,7 +178,7 @@ func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]La
 			query += " AND "
 		}
 
-		query += "tanggal <= ?"
+		query += "tanggal_pengambilan <= ?"
 
 		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
 		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
@@ -210,7 +210,7 @@ func (ServisanModel) TeknisiReport(form forms.ServisanTeknisiReportForm) ([]Tekn
 			query += " AND "
 		}
 
-		query += "tanggal >= ?"
+		query += "tanggal_pengambilan >= ?"
 
 		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
 		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
@@ -221,7 +221,7 @@ func (ServisanModel) TeknisiReport(form forms.ServisanTeknisiReportForm) ([]Tekn
 			query += " AND "
 		}
 
-		query += "tanggal <= ?"
+		query += "tanggal_pengambilan <= ?"
 
 		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
 		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
