@@ -187,7 +187,7 @@ func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]La
 	err := db.GetDB().
 		Model(&Servisan{}).
 		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.biaya, servisan.harga_sparepart, servisan.laba_rugi").
-		Where("status LIKE '%Sudah diambil%'").
+		Where("status::TEXT LIKE '%Sudah diambil%'").
 		Where(query, params...).
 		Order("nomor_nota ASC").Find(&labaRugiList).Error
 
@@ -230,7 +230,7 @@ func (ServisanModel) TeknisiReport(form forms.ServisanTeknisiReportForm) ([]Tekn
 	err := db.GetDB().
 		Model(&Servisan{}).
 		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.biaya, servisan.harga_sparepart, servisan.laba_rugi, teknisi.nama as teknisi").
-		Where("status LIKE '%Sudah diambil%'").
+		Where("status::TEXT LIKE '%Sudah diambil%'").
 		Where("id_teknisi = ?", form.IDTeknisi).
 		Where(query, params...).
 		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
