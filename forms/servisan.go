@@ -7,10 +7,21 @@ import (
 )
 
 type GetAllServisanForm struct {
-	SearchQuery string                 `form:"q"`
-	SearchBy    utils.ServisanSearchBy `form:"by" binding:"servisan_search_by_col"`
-	MinDate     time.Time              `form:"min_date"`
-	MaxDate     time.Time              `form:"max_date"`
+	SearchQuery 	 string                 `form:"q"`
+	SearchBy    	 utils.ServisanSearchBy `form:"by" binding:"servisan_search_by_col"`
+	MinDate     	 time.Time              `form:"min_date"`
+	MaxDate     	 time.Time              `form:"max_date"`
+}
+
+type ServisanLabaRugiReportForm struct {
+	MinDate time.Time `form:"min_date"`
+	MaxDate time.Time `form:"max_date"`
+}
+
+type ServisanTeknisiReportForm struct {
+	MinDate    time.Time `form:"min_date"`
+	MaxDate    time.Time `form:"max_date"`
+	IDTeknisi  int 	  	 `form:"id_teknisi"`
 }
 
 type CreateServisanForm struct {

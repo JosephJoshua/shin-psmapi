@@ -43,6 +43,27 @@ type Servisan struct {
 	TanggalPengambilan utils.NullTime       `json:"tanggal_pengambilan" gorm:"type:timestamp with timezone"`
 }
 
+type LabaRugiReportItem struct {
+	NomorNota 		    int					`json:"nomor_nota"`
+	TanggalPengambilan  time.Time			`json:"tanggal_pengambilan"`
+	TipeHp 			    string				`json:"tipe_hp"`
+	Kerusakan 		    string				`json:"kerusakan"`
+	Biaya 			    float64				`json:"biaya"`
+	HargaSparepart 	    float64				`json:"harga_sparepart"`
+	LabaRugi 		    float64				`json:"laba_rugi"`
+}
+
+type TeknisiReportItem struct {
+	NomorNota 		    int					`json:"nomor_nota"`
+	TanggalPengambilan  time.Time			`json:"tanggal_pengambilan"`
+	TipeHp 			    string				`json:"tipe_hp"`
+	Kerusakan 		    string				`json:"kerusakan"`
+	Biaya 			    float64				`json:"biaya"`
+	HargaSparepart 	    float64				`json:"harga_sparepart"`
+	LabaRugi 		    float64				`json:"laba_rugi"`
+	Teknisi				string				`json:"teknisi"`
+}
+
 func (Servisan) TableName() string {
 	return "servisan"
 }
@@ -132,6 +153,94 @@ func (ServisanModel) ByNomorNota(nomorNota int) (*Servisan, error) {
 	}
 
 	return servisan, nil
+}
+
+func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]LabaRugiReportItem, error) {
+	var (
+		labaRugiList []LabaRugiReportItem
+		query        string
+		params       []interface{}
+	)
+
+	if !form.MinDate.IsZero() {
+		if len(params) > 0 {
+			query += " AND "
+		}
+
+		query += "tanggal >= ?"
+
+		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+	}
+
+	if !form.MaxDate.IsZero() {
+		if len(params) > 0 {
+			query += " AND "
+		}
+
+		query += "tanggal <= ?"
+
+		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+	}
+
+	err := db.GetDB().
+		Model(&Servisan{}).
+		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.biaya, servisan.harga_sparepart, servisan.laba_rugi").
+		Where("status LIKE '%Sudah diambil%'").
+		Where(query, params...).
+		Order("nomor_nota ASC").Find(&labaRugiList).Error
+
+	if err != nil {
+		return labaRugiList, err
+	}
+
+	return labaRugiList, nil
+}
+
+func (ServisanModel) TeknisiReport(form forms.ServisanTeknisiReportForm) ([]TeknisiReportItem, error) {
+	var (
+		teknisiReportItemList []TeknisiReportItem
+		query        		  string
+		params       		  []interface{}
+	)
+
+	if !form.MinDate.IsZero() {
+		if len(params) > 0 {
+			query += " AND "
+		}
+
+		query += "tanggal >= ?"
+
+		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+	}
+
+	if !form.MaxDate.IsZero() {
+		if len(params) > 0 {
+			query += " AND "
+		}
+
+		query += "tanggal <= ?"
+
+		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+	}
+
+	err := db.GetDB().
+		Model(&Servisan{}).
+		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.biaya, servisan.harga_sparepart, servisan.laba_rugi, teknisi.nama as teknisi").
+		Where("status LIKE '%Sudah diambil%'").
+		Where("id_teknisi = ?", form.IDTeknisi).
+		Where(query, params...).
+		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
+		Order("nomor_nota ASC").Find(&teknisiReportItemList).Error
+
+	if err != nil {
+		return teknisiReportItemList, err
+	}
+
+	return teknisiReportItemList, nil
 }
 
 func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err error) {
