@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"time"
+  "path/filepath"
 
 	"github.com/JosephJoshua/shin-psmapi/conf"
 	"github.com/JosephJoshua/shin-psmapi/db"
@@ -51,8 +52,16 @@ func loadDotEnvFile() {
 }
 
 func createLogFile() *os.File {
+  const logDir string = "logs/"
+
+  err := os.MkdirAll(logDir, os.ModePerm)
+  if err != nil {
+    log.Fatal("Unable to create logs/ folder:\n" + err.Error())
+    return nil
+  }
+
 	dateStr := time.Now().Format("2006-01-02")
-	filePath := fmt.Sprintf("logs/%v.log", dateStr)
+  filePath := filepath.Join(logDir, fmt.Sprintf("%v.log", dateStr))
 
 	// Open a file with append mode if it exists; if it doesn't, create it.
 	logFile, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)

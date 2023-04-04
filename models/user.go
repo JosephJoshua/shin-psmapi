@@ -10,11 +10,15 @@ import (
 )
 
 type User struct {
-	ID       int            `json:"id"`
+  ID       int            `json:"id" gorm:"<-:false,autoIncrement,not null"`
 	Email    string         `json:"email" gorm:"size:256,not null"`
 	Password string         `json:"password" gorm:"size:128,not null"`
 	Username string         `json:"username" gorm:"size:256,not null"`
 	Role     utils.UserRole `json:"role" gorm:"type:user_role,not null"`
+}
+
+func (User) TableName() string {
+	return "users"
 }
 
 type UserModel struct{}
