@@ -186,7 +186,7 @@ func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]La
 
 	err := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya, servisan.harga_sparepart, servisan.laba_rugi").
+		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya as biaya, servisan.harga_sparepart, servisan.laba_rugi").
 		Where("status::TEXT LIKE '%Sudah diambil%'").
 		Where(query, params...).
 		Order("nomor_nota ASC").Find(&labaRugiList).Error
@@ -229,7 +229,7 @@ func (ServisanModel) TeknisiReport(form forms.ServisanTeknisiReportForm) ([]Tekn
 
 	err := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya, servisan.harga_sparepart, servisan.laba_rugi, teknisi.nama as teknisi").
+		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya as biaya, servisan.harga_sparepart, servisan.laba_rugi, teknisi.nama as teknisi").
 		Where("status::TEXT LIKE '%Sudah diambil%'").
 		Where("id_teknisi = ?", form.IDTeknisi).
 		Where(query, params...).
