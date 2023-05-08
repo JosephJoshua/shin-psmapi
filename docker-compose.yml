@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    tty: true
+    environment:
+      JWT_KEY: ${JWT_KEY}
+      DB_PASSWORD: ${DB_PASSWORD}
+      PORT: 8080
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: api
+      DB_NAME: api
+      DB_SSLMODE: disable
+      GIN_MODE: release
+    ports:
+      - "${PORT}:8080"
+    depends_on:
+      - db
+    networks:
+      - api
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "nginx-conf.d:/etc/nginx/conf.d"
+    networks:
+      - api
+
+  db:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    tty: true
+    environment:
+      POSTGRES_DB: api
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - "postgres:/data/postgres"
+    networks:
+      - api
+
+volumes:
+  postgres:
+
+networks:
+  api:
+    driver: bridge

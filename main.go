@@ -5,8 +5,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
-  "path/filepath"
 
 	"github.com/JosephJoshua/shin-psmapi/conf"
 	"github.com/JosephJoshua/shin-psmapi/db"
@@ -45,7 +45,7 @@ func main() {
 
 func loadDotEnvFile() {
 	err := godotenv.Load()
-	if err != nil {
+	if err != nil && !os.IsNotExist(err) {
 		log.Fatal("Failed to load .env file")
 		return
 	}
