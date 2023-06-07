@@ -8,8 +8,8 @@ import (
 )
 
 type Teknisi struct {
-	ID   int    `json:"id"`
-	Nama string `json:"nama" gorm:"size:256,not null"`
+	ID   int    `json:"id" gorm:"primaryKey;autoIncrement"`
+	Nama string `json:"nama" gorm:"size:256;not null"`
 }
 
 func (Teknisi) TableName() string {

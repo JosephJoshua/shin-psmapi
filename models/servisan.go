@@ -30,7 +30,7 @@ type Servisan struct {
 	Status             utils.StatusServisan `json:"status" gorm:"type:status_servisan;not null"`
 	NamaTeknisi        string               `json:"nama_teknisi" gorm:"->"`
 	NamaSales          string               `json:"nama_sales" gorm:"->"`
-	TanggalKonfirmasi  utils.NullTime       `json:"tanggal_konfirmasi" gorm:"type:timestamp with time zone"`
+	TanggalKonfirmasi  utils.NullTime       `json:"tanggal_konfirmasi" gorm:"type:timestamptz"`
 	IsiKonfirmasi      string               `json:"isi_konfirmasi" gorm:"size:512"`
 	Biaya              float64              `json:"biaya" gorm:"type:double precision;not null;default:0"`
 	Diskon             int                  `json:"diskon" gorm:"check:valid_diskon,diskon >= 0 AND diskon <= 100;not null;default:0"`
@@ -40,7 +40,7 @@ type Servisan struct {
 	HargaSparepart     float64              `json:"harga_sparepart" gorm:"->;type:double precision;not null;default:0"`
 	Sisa               float64              `json:"sisa" gorm:"->;type:double precision GENERATED ALWAYS AS (((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya) - dp)) STORED;not null"`
 	LabaRugi           float64              `json:"laba_rugi" gorm:"->;type:double precision;not null;default:0"`
-	TanggalPengambilan utils.NullTime       `json:"tanggal_pengambilan" gorm:"type:timestamp with timezone"`
+	TanggalPengambilan utils.NullTime       `json:"tanggal_pengambilan" gorm:"type:timestamptz"`
 }
 
 type LabaRugiReportItem struct {
