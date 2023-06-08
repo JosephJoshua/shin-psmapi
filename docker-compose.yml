@@ -1,26 +1,5 @@
 version: "3.9"
 services:
-  web:
-    build: .
-    restart: unless-stopped
-    tty: true
-    environment:
-      JWT_KEY: ${JWT_KEY}
-      DB_PASSWORD: ${DB_PASSWORD}
-      PORT: 8080
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: api
-      DB_NAME: api
-      DB_SSLMODE: disable
-      GIN_MODE: release
-    ports:
-      - ${PORT}:8080
-    depends_on:
-      - db
-    networks:
-      - api
-
   nginx:
     image: nginx:alpine
     restart: unless-stopped
@@ -32,27 +11,89 @@ services:
       - "./nginx/default.conf:/etc/nginx/conf.d/default.conf"
       - "./nginx/ssl:/ssl"
     networks:
-      - api
+      - pscapi
+      - galerieapi
 
-  db:
+  pscapi:
+    build: .
+    restart: unless-stopped
+    tty: true
+    environment:
+      JWT_KEY: ${PSC_JWT_KEY}
+      DB_PASSWORD: ${PSC_DB_PASSWORD}
+      PORT: 8080
+      DB_HOST: pscdb
+      DB_PORT: 5432
+      DB_USER: api
+      DB_NAME: api
+      DB_SSLMODE: disable
+      GIN_MODE: release
+    ports:
+      - ${PSC_PORT}:8080
+    depends_on:
+      - pscdb
+    networks:
+      - pscapi
+
+  galerieapi:
+    build: .
+    restart: unless-stopped
+    tty: true
+    environment:
+      JWT_KEY: ${GALERIE_JWT_KEY}
+      DB_PASSWORD: ${GALERIE_DB_PASSWORD}
+      PORT: 8080
+      DB_HOST: galeriedb
+      DB_PORT: 5432
+      DB_USER: api
+      DB_NAME: api
+      DB_SSLMODE: disable
+      GIN_MODE: release
+    ports:
+      - ${GALERIE_PORT}:8080
+    depends_on:
+      - galeriedb
+    networks:
+      - galerieapi
+
+  pscdb:
     image: postgres:13.2-alpine
     restart: unless-stopped
     tty: true
     environment:
       POSTGRES_DB: api
       POSTGRES_USER: api
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${PSC_DB_PASSWORD}
       PGDATA: /data/postgres
     ports:
       - 5432:5432
     volumes:
-      - "postgres:/data/postgres"
+      - "pscdb:/data/postgres"
     networks:
-      - api
+      - pscapi
+
+  galeriedb:
+    image: postgres:13.2-alpine
+    restart: unless-stopped
+    tty: true
+    environment:
+      POSTGRES_DB: api
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: ${GALERIE_DB_PASSWORD}
+      PGDATA: /data/postgres
+    ports:
+      - 5433:5432
+    volumes:
+      - "galeriedb:/data/postgres"
+    networks:
+      - galerieapi
 
 volumes:
-  postgres:
+  pscdb:
+  galeriedb:
 
 networks:
-  api:
+  pscapi:
+    driver: bridge
+  galerieapi:
     driver: bridge
