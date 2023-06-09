@@ -39,7 +39,7 @@ type Servisan struct {
 	TotalBiaya         float64              `json:"total_biaya" gorm:"->;type:double precision GENERATED ALWAYS AS ((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya)) STORED;not null"`
 	HargaSparepart     float64              `json:"harga_sparepart" gorm:"->;type:double precision;not null;default:0"`
 	Sisa               float64              `json:"sisa" gorm:"->;type:double precision GENERATED ALWAYS AS (((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya) - dp)) STORED;not null"`
-	LabaRugi           float64              `json:"laba_rugi" gorm:"->;type:double precision;not null;default:0"`
+	LabaRugi           float64              `json:"laba_rugi" gorm:"->;type:double precision GENERATED ALWAYS AS ((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya) - harga_sparepart) STORED;not null"`
 	TanggalPengambilan utils.NullTime       `json:"tanggal_pengambilan" gorm:"type:timestamptz"`
 }
 
