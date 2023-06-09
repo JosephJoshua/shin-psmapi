@@ -65,45 +65,54 @@ func (SparepartModel) ByNomorNota(nomorNota int) ([]Sparepart, error) {
 
 func (SparepartModel) Create(form forms.CreateSparepartForm) (id int, err error) {
 	servisan := Servisan{NomorNota: form.NomorNota}
-	result := db.GetDB().First(&servisan)
-	
-	if result.RowsAffected == 0 {
-		return 0, fmt.Errorf("tidak ada servisan dengan nomor nota %d", form.NomorNota)
+
+	err = db.GetDB().First(&servisan).Error
+	if err != nil {
+		return 0, fmt.Errorf("gagal mengambil servisan: %v", err)
 	}
 
 	sparepart := Sparepart{NomorNota: form.NomorNota, Harga: form.Harga, Nama: form.Nama}
 
 	err = db.GetDB().Create(&sparepart).Error
 	if err != nil {
-		return
+		return 0, fmt.Errorf("gagal membuat sparepart: %v", err)
 	}
 
 	servisan.HargaSparepart += form.Harga
 
 	err = db.GetDB().Save(&servisan).Error
-	return sparepart.ID, err
+	if err != nil {
+		return 0, fmt.Errorf("gagal mengubah servisan: %v", err)
+	}
+
+	return sparepart.ID, nil
 }
 
 func (SparepartModel) Delete(id int) error {
 	sparepart := Sparepart{ID: id}
-	res := db.GetDB().First(&sparepart)
-	if res.RowsAffected == 0 {
-		return fmt.Errorf("tidak ada sparepart dengan ID %d", id)
-	}
+
+	err := db.GetDB().First(&sparepart, id).Error
+	if err != nil {
+		return fmt.Errorf("gagal mengambil sparepart: %v", err)
+	}	
 
 	servisan := Servisan{NomorNota: sparepart.NomorNota}
-	db.GetDB().First(&servisan)
+
+	err = db.GetDB().First(&servisan).Error
+	if err != nil {
+		return fmt.Errorf("gagal mengambil servisan: %v", err)
+	}
 	
 	servisan.HargaSparepart -= sparepart.Harga
 
-	err := db.GetDB().Save(&servisan).Error
+	err = db.GetDB().Save(&servisan).Error
 	if err != nil {
-		return err
+		return fmt.Errorf("gagal merubah servisan: %v", err)
 	}
 
 	err = db.GetDB().Delete(&sparepart).Error
 	if err != nil {
-		return err
+		return fmt.Errorf("gagal menghapus sparepart: %v", err)
 	}
 
 	return nil
