@@ -18,6 +18,11 @@ type ServisanLabaRugiReportForm struct {
 	MaxDate time.Time `form:"max_date"`
 }
 
+type ServisanSisaReportForm struct {
+	MinDate time.Time `form:"min_date"`
+	MaxDate time.Time `form:"max_date"`
+}
+
 type ServisanTeknisiReportForm struct {
 	MinDate    time.Time `form:"min_date"`
 	MaxDate    time.Time `form:"max_date"`

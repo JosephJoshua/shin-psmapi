@@ -64,6 +64,7 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	{
 		servisanReportRoutes.GET("/laba-rugi", servisanController.GetLabaRugiReport)
 		servisanReportRoutes.GET("/teknisi", servisanController.GetTeknisiReport)
+		servisanReportRoutes.GET("/sisa", servisanController.GetSisaReport)
 	}
 
 	sparepartRoutes := r.Group("/sparepart")

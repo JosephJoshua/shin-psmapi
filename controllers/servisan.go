@@ -61,6 +61,30 @@ func (ServisanController) GetLabaRugiReport(c *gin.Context) {
 	c.JSON(http.StatusOK, report)
 }
 
+func (ServisanController) GetSisaReport(c *gin.Context) {
+	form := forms.ServisanSisaReportForm{}
+	if err := c.ShouldBindQuery(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid query parameters",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	report, err := servisanModel.SisaReport(form)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Gagal saat mengambil servisan",
+			"error":   err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, report)
+}
+
 func (ServisanController) GetTeknisiReport(c *gin.Context) {
 	form := forms.ServisanTeknisiReportForm{}
 	if err := c.ShouldBindQuery(&form); err != nil {

@@ -53,6 +53,16 @@ type LabaRugiReportItem struct {
 	LabaRugi 		    float64				`json:"laba_rugi"`
 }
 
+type SisaReportItem struct {
+	NomorNota 		    	int						`json:"nomor_nota"`
+	TanggalPengambilan  time.Time			`json:"tanggal_pengambilan"`
+	TipeHp 			    		string				`json:"tipe_hp"`
+	Kerusakan 		    	string				`json:"kerusakan"`
+	Biaya 			    		float64				`json:"biaya"`
+	DP									float64       `json:"dp"`
+	Sisa                float64       `json:"sisa"`
+}
+
 type TeknisiReportItem struct {
 	NomorNota 		    int					`json:"nomor_nota"`
 	TanggalPengambilan  time.Time			`json:"tanggal_pengambilan"`
@@ -196,6 +206,45 @@ func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]La
 	}
 
 	return labaRugiList, nil
+}
+
+func (ServisanModel) SisaReport(form forms.ServisanSisaReportForm) ([]SisaReportItem, error) {
+	var (
+		sisaList 		[]SisaReportItem
+		query       string
+		params      []interface{}
+	)
+
+	if !form.MinDate.IsZero() {
+		if len(params) > 0 {
+			query += " AND "
+		}
+
+		query += "tanggal_pengambilan >= ?"
+
+		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+	}
+
+	if !form.MaxDate.IsZero() {
+		if len(params) > 0 {
+			query += " AND "
+		}
+
+		query += "tanggal_pengambilan <= ?"
+
+		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
+		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+	}
+
+	err := db.GetDB().
+		Model(&Servisan{}).
+		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya as biaya, servisan.dp, servisan.sisa").
+		Where("status::TEXT LIKE '%Sudah diambil%'").
+		Where(query, params...).
+		Order("nomor_nota ASC").Find(&sisaList).Error
+		
+	return sisaList, err
 }
 
 func (ServisanModel) TeknisiReport(form forms.ServisanTeknisiReportForm) ([]TeknisiReportItem, error) {
