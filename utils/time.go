@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+const (
+	DateOnly = "2006-01-02"
+)
+
 // NullTime is a wrapper around sql.NullTime to allow flattening when json.Marshal is called
 type NullTime sql.NullTime
 

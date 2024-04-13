@@ -50,7 +50,7 @@ func (SalesController) GetByID(c *gin.Context) {
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "ID sales harus berupa angka"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "ID harus berupa angka"})
 		return
 	}
 

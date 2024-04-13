@@ -48,6 +48,7 @@ type CreateServisanForm struct {
 	Biaya             float64              `json:"biaya"`
 	Diskon            int                  `json:"diskon" binding:"min=0,max=100"`
 	DP                float64              `json:"dp"`
+	IDDPType 				  int  								 `json:"id_dp_type"`
 	TambahanBiaya     float64              `json:"tambahan_biaya"`
 }
 
@@ -70,5 +71,6 @@ type UpdateServisanForm struct {
 	Biaya             *float64              `json:"biaya" binding:"omitempty"`
 	Diskon            *int                  `json:"diskon" binding:"omitempty,min=0,max=100"`
 	DP                *float64              `json:"dp" binding:"omitempty"`
+	IDDPType 				  int  								  `json:"id_dp_type" binding:"omitempty"`
 	TambahanBiaya     *float64              `json:"tambahan_biaya" binding:"omitempty"`
 }

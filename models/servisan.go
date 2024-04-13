@@ -35,6 +35,8 @@ type Servisan struct {
 	Biaya              float64              `json:"biaya" gorm:"type:double precision;not null;default:0"`
 	Diskon             int                  `json:"diskon" gorm:"check:valid_diskon,diskon >= 0 AND diskon <= 100;not null;default:0"`
 	DP                 float64              `json:"dp" gorm:"type:double precision;not null;default:0"`
+	IDDPType					 int 									`json:"id_dp_type" gorm:"type:integer;not null"`
+	DPType 						 DPType 							`json:"-" gorm:"foreignKey:IDDPType;constraint:OnDelete:RESTRICT;"`
 	TambahanBiaya      float64              `json:"tambahan_biaya" gorm:"type:double precision;not null;default:0"`
 	TotalBiaya         float64              `json:"total_biaya" gorm:"->;type:double precision GENERATED ALWAYS AS ((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya)) STORED;not null"`
 	HargaSparepart     float64              `json:"harga_sparepart" gorm:"type:double precision;not null;default:0"`
@@ -44,13 +46,13 @@ type Servisan struct {
 }
 
 type LabaRugiReportItem struct {
-	NomorNota 		    int					`json:"nomor_nota"`
+	NomorNota 		    	int						`json:"nomor_nota"`
 	TanggalPengambilan  time.Time			`json:"tanggal_pengambilan"`
-	TipeHp 			    string				`json:"tipe_hp"`
-	Kerusakan 		    string				`json:"kerusakan"`
-	Biaya 			    float64				`json:"biaya"`
+	TipeHp 			    		string				`json:"tipe_hp"`
+	Kerusakan 		    	string				`json:"kerusakan"`
+	Biaya 			    		float64				`json:"biaya"`
 	HargaSparepart 	    float64				`json:"harga_sparepart"`
-	LabaRugi 		    float64				`json:"laba_rugi"`
+	LabaRugi 		    		float64				`json:"laba_rugi"`
 }
 
 type SisaReportItem struct {
@@ -64,14 +66,14 @@ type SisaReportItem struct {
 }
 
 type TeknisiReportItem struct {
-	NomorNota 		    int					`json:"nomor_nota"`
+	NomorNota 		    	int						`json:"nomor_nota"`
 	TanggalPengambilan  time.Time			`json:"tanggal_pengambilan"`
-	TipeHp 			    string				`json:"tipe_hp"`
-	Kerusakan 		    string				`json:"kerusakan"`
-	Biaya 			    float64				`json:"biaya"`
+	TipeHp 			    		string				`json:"tipe_hp"`
+	Kerusakan 		  	  string				`json:"kerusakan"`
+	Biaya 			    		float64				`json:"biaya"`
 	HargaSparepart 	    float64				`json:"harga_sparepart"`
-	LabaRugi 		    float64				`json:"laba_rugi"`
-	Teknisi				string				`json:"teknisi"`
+	LabaRugi 		    		float64				`json:"laba_rugi"`
+	Teknisi							string				`json:"teknisi"`
 }
 
 func (Servisan) TableName() string {
@@ -111,10 +113,9 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 				query += " AND "
 			}
 
-			query += "tanggal >= ?"
+			query += "DATE(tanggal) >= ?"
 
-			// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-			params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+			params = append(params, form.MinDate.Format(utils.DateOnly))
 		}
 
 		if !form.MaxDate.IsZero() {
@@ -122,18 +123,18 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 				query += " AND "
 			}
 
-			query += "tanggal <= ?"
+			query += "DATE(tanggal) <= ?"
 
-			// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-			params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+			params = append(params, form.MaxDate.Format(utils.DateOnly))
 		}
 	}
 
 	err := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales").
+		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales, dp_types.name as dp_type").
 		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
 		Joins("LEFT JOIN sales ON servisan.id_sales = sales.id").
+		Joins("LEFT JOIN dp_types ON servisan.id_dp_type = dp_types.id").
 		Where(query, params...).
 		Order("nomor_nota ASC").Find(&servisanList).Error
 
@@ -149,9 +150,10 @@ func (ServisanModel) ByNomorNota(nomorNota int) (*Servisan, error) {
 
 	res := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales").
+		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales, dp_types.name as dp_type").
 		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
 		Joins("LEFT JOIN sales on servisan.id_sales = sales.id").
+		Joins("LEFT JOIN dp_types ON servisan.id_dp_type = dp_types.id").
 		Where("nomor_nota = ?", nomorNota).Find(&servisan)
 
 	if res.Error != nil {
@@ -177,10 +179,9 @@ func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]La
 			query += " AND "
 		}
 
-		query += "tanggal_pengambilan >= ?"
+		query += "DATE(tanggal_pengambilan) >= ?"
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+		params = append(params, form.MinDate.Format(utils.DateOnly))
 	}
 
 	if !form.MaxDate.IsZero() {
@@ -188,10 +189,9 @@ func (ServisanModel) LabaRugiReport(form forms.ServisanLabaRugiReportForm) ([]La
 			query += " AND "
 		}
 
-		query += "tanggal_pengambilan <= ?"
+		query += "DATE(tanggal_pengambilan) <= ?"
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+		params = append(params, form.MaxDate.Format(utils.DateOnly))
 	}
 
 	err := db.GetDB().
@@ -220,10 +220,9 @@ func (ServisanModel) SisaReport(form forms.ServisanSisaReportForm) ([]SisaReport
 			query += " AND "
 		}
 
-		query += "tanggal_pengambilan >= ?"
+		query += "DATE(tanggal_pengambilan) >= ?"
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+		params = append(params, form.MinDate.Format(utils.DateOnly))
 	}
 
 	if !form.MaxDate.IsZero() {
@@ -231,17 +230,17 @@ func (ServisanModel) SisaReport(form forms.ServisanSisaReportForm) ([]SisaReport
 			query += " AND "
 		}
 
-		query += "tanggal_pengambilan <= ?"
+		query += "DATE(tanggal_pengambilan) <= ?"
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+		params = append(params, form.MaxDate.Format(utils.DateOnly))
 	}
 
 	err := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya as biaya, servisan.dp, servisan.sisa").
+		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya as biaya, servisan.dp, dp_types.name, servisan.sisa").
 		Where("status::TEXT LIKE '%Sudah diambil%'").
 		Where(query, params...).
+		Joins("LEFT JOIN dp_types ON servisan.id_dp_type = dp_types.id").
 		Order("nomor_nota ASC").Find(&sisaList).Error
 		
 	return sisaList, err
@@ -259,21 +258,19 @@ func (ServisanModel) TeknisiReport(form forms.ServisanTeknisiReportForm) ([]Tekn
 			query += " AND "
 		}
 
-		query += "tanggal_pengambilan >= ?"
+		query += "DATE(tanggal_pengambilan) >= ?"
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+		params = append(params, form.MinDate.Format(utils.DateOnly))
 	}
 
 	if !form.MaxDate.IsZero() {
 		if len(params) > 0 {
 			query += " AND "
 		}
+		
+		query += "DATE(tanggal_pengambilan) <= ?"
 
-		query += "tanggal_pengambilan <= ?"
-
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+		params = append(params, form.MaxDate.Format(utils.DateOnly))
 	}
 
 	err := db.GetDB().
@@ -312,6 +309,7 @@ func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err e
 		Biaya:              form.Biaya,
 		Diskon:             form.Diskon,
 		DP:                 form.DP,
+		IDDPType: 					form.IDDPType,
 		TambahanBiaya:      form.TambahanBiaya,
 		TanggalPengambilan: getTanggalPengambilan(form.Status),
 	}
@@ -340,6 +338,7 @@ func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error 
 	insertToMapIfExists(form.Biaya, "biaya", &newServisan)
 	insertToMapIfExists(form.Diskon, "diskon", &newServisan)
 	insertToMapIfExists(form.DP, "dp", &newServisan)
+	insertToMapIfExists(form.IDDPType, "id_dp_type", &newServisan)
 	insertToMapIfExists(form.TambahanBiaya, "tambahan_biaya", &newServisan)
 
 	newServisan["tanggal_konfirmasi"] = utils.ToNullableTime(form.TanggalKonfirmasi)

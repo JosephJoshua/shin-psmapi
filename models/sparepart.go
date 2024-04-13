@@ -32,10 +32,9 @@ func (SparepartModel) All(form forms.GetAllSparepartForm) ([]Sparepart, error) {
 	)
 
 	if !form.MinDate.IsZero() {
-		query += "tanggal_pembelian >= ?"
+		query += "DATE(tanggal_pembelian) >= ?"
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MinDate))
+		params = append(params, form.MinDate.Format(utils.DateOnly))
 	}
 
 	if !form.MaxDate.IsZero() {
@@ -43,10 +42,9 @@ func (SparepartModel) All(form forms.GetAllSparepartForm) ([]Sparepart, error) {
 			query += " AND "
 		}
 
-		query += "tanggal_pembelian <= ?"
+		query += "DATE(tanggal_pembelian) <= ?"
 
-		// MUST convert to ISO8601/RFC3339 format first before sending it to the postgres db
-		params = append(params, utils.ToRFC3339TimeString(form.MaxDate))
+		params = append(params, form.MaxDate.Format(utils.DateOnly))
 	}
 
 	if err := db.GetDB().Where(query, params...).Find(&sparepartList).Error; err != nil {

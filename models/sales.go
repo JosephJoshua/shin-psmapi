@@ -12,6 +12,10 @@ type Sales struct {
 	Nama string `json:"nama" gorm:"size:256;not null"`
 }
 
+func (Sales) TableName() string {
+	return "sales"
+}
+
 type SalesModel struct{}
 
 func (SalesModel) All(searchQuery string) ([]Sales, error) {
@@ -19,7 +23,7 @@ func (SalesModel) All(searchQuery string) ([]Sales, error) {
 
 	err := db.GetDB().Where("LOWER(nama) LIKE '%' || LOWER(?) || '%'", searchQuery).Find(&salesList).Error
 	if err != nil {
-		return salesList, err
+		return salesList, fmt.Errorf("All: %w", err)
 	}
 
 	return salesList, nil
@@ -35,7 +39,7 @@ func (SalesModel) ByID(id int) (*Sales, error) {
 	}
 
 	if res.RowsAffected < 1 {
-		return &Sales{}, fmt.Errorf("tidak ada sales dengan ID %d", id)
+		return nil, fmt.Errorf("tidak ada sales dengan ID %d", id)
 	}
 
 	return sales, nil
