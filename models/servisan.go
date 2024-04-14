@@ -35,8 +35,6 @@ type Servisan struct {
 	Biaya              float64              `json:"biaya" gorm:"type:double precision;not null;default:0"`
 	Diskon             int                  `json:"diskon" gorm:"check:valid_diskon,diskon >= 0 AND diskon <= 100;not null;default:0"`
 	DP                 float64              `json:"dp" gorm:"type:double precision;not null;default:0"`
-	IDDPType					 int 									`json:"id_dp_type" gorm:"type:integer;not null"`
-	DPType 						 DPType 							`json:"-" gorm:"foreignKey:IDDPType;constraint:OnDelete:RESTRICT;"`
 	TambahanBiaya      float64              `json:"tambahan_biaya" gorm:"type:double precision;not null;default:0"`
 	TotalBiaya         float64              `json:"total_biaya" gorm:"->;type:double precision GENERATED ALWAYS AS ((((((100.0)::double precision - (diskon)::double precision) / (100.0)::double precision) * biaya) + tambahan_biaya)) STORED;not null"`
 	HargaSparepart     float64              `json:"harga_sparepart" gorm:"type:double precision;not null;default:0"`
@@ -131,10 +129,9 @@ func (ServisanModel) All(form forms.GetAllServisanForm) ([]Servisan, error) {
 
 	err := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales, dp_types.name as dp_type").
+		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales").
 		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
 		Joins("LEFT JOIN sales ON servisan.id_sales = sales.id").
-		Joins("LEFT JOIN dp_types ON servisan.id_dp_type = dp_types.id").
 		Where(query, params...).
 		Order("nomor_nota ASC").Find(&servisanList).Error
 
@@ -150,10 +147,9 @@ func (ServisanModel) ByNomorNota(nomorNota int) (*Servisan, error) {
 
 	res := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales, dp_types.name as dp_type").
+		Select("servisan.*, teknisi.nama as nama_teknisi, sales.nama as nama_sales").
 		Joins("LEFT JOIN teknisi ON servisan.id_teknisi = teknisi.id").
 		Joins("LEFT JOIN sales on servisan.id_sales = sales.id").
-		Joins("LEFT JOIN dp_types ON servisan.id_dp_type = dp_types.id").
 		Where("nomor_nota = ?", nomorNota).Find(&servisan)
 
 	if res.Error != nil {
@@ -237,10 +233,9 @@ func (ServisanModel) SisaReport(form forms.ServisanSisaReportForm) ([]SisaReport
 
 	err := db.GetDB().
 		Model(&Servisan{}).
-		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya as biaya, servisan.dp, dp_types.name, servisan.sisa").
+		Select("servisan.nomor_nota, servisan.tanggal_pengambilan, servisan.tipe_hp, servisan.kerusakan, servisan.total_biaya as biaya, servisan.dp, servisan.sisa").
 		Where("status::TEXT LIKE '%Sudah diambil%'").
 		Where(query, params...).
-		Joins("LEFT JOIN dp_types ON servisan.id_dp_type = dp_types.id").
 		Order("nomor_nota ASC").Find(&sisaList).Error
 		
 	return sisaList, err
@@ -309,7 +304,6 @@ func (ServisanModel) Create(form forms.CreateServisanForm) (nomorNota int, err e
 		Biaya:              form.Biaya,
 		Diskon:             form.Diskon,
 		DP:                 form.DP,
-		IDDPType: 					form.IDDPType,
 		TambahanBiaya:      form.TambahanBiaya,
 		TanggalPengambilan: getTanggalPengambilan(form.Status),
 	}
@@ -338,7 +332,6 @@ func (ServisanModel) Update(nomorNota int, form forms.UpdateServisanForm) error 
 	insertToMapIfExists(form.Biaya, "biaya", &newServisan)
 	insertToMapIfExists(form.Diskon, "diskon", &newServisan)
 	insertToMapIfExists(form.DP, "dp", &newServisan)
-	insertToMapIfExists(form.IDDPType, "id_dp_type", &newServisan)
 	insertToMapIfExists(form.TambahanBiaya, "tambahan_biaya", &newServisan)
 
 	newServisan["tanggal_konfirmasi"] = utils.ToNullableTime(form.TanggalKonfirmasi)

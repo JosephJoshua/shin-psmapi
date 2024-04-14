@@ -8,7 +8,6 @@ import (
 
 func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	userController := controllers.UserController{}
-	dpTypeController := controllers.DPTypeController{}
 	salesController := controllers.SalesController{}
 	teknisiController := controllers.TeknisiController{}
 	servisanController := controllers.ServisanController{}
@@ -30,13 +29,6 @@ func SetupRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	{
 		userRoutes.GET("/", userController.GetAll)
 		userRoutes.GET("/current", userController.GetLoggedInUser)
-	}
-	
-	dpTypeRoutes := r.Group("/dp-types")
-	dpTypeRoutes.Use(authMiddleware.MiddlewareFunc())
-	{
-		dpTypeRoutes.GET("/", dpTypeController.GetAll)
-		dpTypeRoutes.GET("/:id", dpTypeController.GetByID)
 	}
 
 	salesRoutes := r.Group("/sales")

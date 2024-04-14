@@ -27,7 +27,6 @@ func MigrateDB(db *gorm.DB) {
 	END$$;
 	`)
 
-	db.AutoMigrate(&models.DPType{})
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Sales{})
 	db.AutoMigrate(&models.Teknisi{})
